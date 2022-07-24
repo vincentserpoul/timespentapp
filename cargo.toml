@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "timespent",
+    "timespent-tauri/src-tauri",
+]

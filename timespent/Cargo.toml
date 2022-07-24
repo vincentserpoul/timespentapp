@@ -1,0 +1,19 @@
+[package]
+name = "timespent"
+description = "timespent parses a folder containing activities split into days"
+version = "0.1.0"
+edition = "2021"
+repository = "https://github.com/rust-lang/rust-clippy"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+keywords = ["timespent", "work", "categories"]
+categories = ["working-tools"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+nom = "7.1"
+chrono = { version = "0.4", features = ["serde"] }
+eyre = "^0.6"
+serde = { version = "^1.0", features = ["derive"] }
+ts-rs = { version = "^6.2", features = ["serde-compat", "chrono-impl"] }
