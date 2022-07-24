@@ -15,7 +15,8 @@ pub struct Filter {
 }
 
 impl Filter {
-    pub fn new(activities: Activities) -> Self {
+    #[must_use]
+    pub fn new(activities: &Activities) -> Self {
         let (min_datetime, max_datetime, projects, actions) = activities.0.iter().fold(
             (
                 activities.0[0].start_datetime,
@@ -28,7 +29,7 @@ impl Filter {
                     min.min(activity.start_datetime),
                     max.max(activity.end_datetime),
                     projects.union(&activity.projects).cloned().collect(),
-                    actions.union(&activity.actions).cloned().collect(),
+                    actions.union(&activity.actions).copied().collect(),
                 )
             },
         );
@@ -44,6 +45,7 @@ impl Filter {
 }
 
 pub trait Filterable {
+    #[must_use]
     fn filter(&self, filter: &Filter) -> Self;
 }
 
@@ -107,6 +109,6 @@ mod tests {
             actions: vec![Action::Code, Action::Review].into_iter().collect(),
         };
 
-        assert_eq!(Filter::new(activities.into()), expected_filter);
+        assert_eq!(Filter::new(&activities.into()), expected_filter);
     }
 }

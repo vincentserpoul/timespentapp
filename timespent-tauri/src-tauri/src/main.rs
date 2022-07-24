@@ -1,3 +1,9 @@
+#![warn(
+    clippy::all,
+    // clippy::restriction,
+    clippy::pedantic,
+    clippy::cargo
+)]
 #![cfg_attr(
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
@@ -28,7 +34,7 @@ struct TimeSpentState {
 fn main() {
     let directory = "../../timespent/tests/days";
     let activities = loader::load(directory).unwrap();
-    let filter = Filter::new(activities.clone());
+    let filter = Filter::new(&activities);
     let filtered_activities = activities.clone();
     let activities_agg = activities.aggregate();
     let aggregates = activities_agg.over_specific_days(&filter.min_date, &filter.max_date);

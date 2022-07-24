@@ -29,7 +29,8 @@ pub struct AllAggregate {
 }
 
 impl Aggregates {
-    pub fn over_specific_days(&self, start_date: &NaiveDate, end_date: &NaiveDate) -> Aggregates {
+    #[must_use]
+    pub fn over_specific_days(&self, start_date: &NaiveDate, end_date: &NaiveDate) -> Self {
         if end_date < start_date {
             return Aggregates {
                 daily: vec![],
