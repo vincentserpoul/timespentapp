@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { DailyAggregate } from "../../timespent/bindings/DailyAggregate";
-
+  import Lines from "./Lines.svelte";
   export let daily: Array<DailyAggregate> = [];
 </script>
 
@@ -22,4 +22,6 @@
       {/each}
     </ul>
   {/each}
+  <h2>chart</h2>
+  <Lines stats={daily} />
 </div>

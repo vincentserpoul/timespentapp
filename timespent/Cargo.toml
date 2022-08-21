@@ -9,11 +9,20 @@ license = "MIT OR Apache-2.0"
 keywords = ["timespent", "work", "categories"]
 categories = ["working-tools"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dev-dependencies]
+criterion = {version = "^0.3", features = ["html_reports"]}
 
 [dependencies]
-nom = "7.1"
-chrono = { version = "0.4", features = ["serde"] }
+nom = "^7"
+chrono = { version = "^0.4", features = ["serde"] }
 eyre = "^0.6"
-serde = { version = "^1.0", features = ["derive"] }
-ts-rs = { version = "^6.2", features = ["serde-compat", "chrono-impl"] }
+serde = { version = "^1", features = ["derive"] }
+ts-rs = { version = "^6", features = ["serde-compat", "chrono-impl"] }
+
+[[bench]]
+name = "graph_x_segments"
+harness = false
+
+[[bench]]
+name = "graph_y_activities"
+harness = false

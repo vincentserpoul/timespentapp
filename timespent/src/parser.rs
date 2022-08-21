@@ -1,5 +1,4 @@
-use crate::activity::Action;
-use crate::activity::Activity;
+use crate::activity::{Action, Activity};
 use chrono::NaiveDateTime;
 use nom::bytes::streaming::{take, take_until};
 use nom::character::complete::multispace0;
@@ -45,6 +44,7 @@ pub fn parse_activity<'a>(date: &str, input: &'a str) -> IResult<&'a str, Activi
 
     let mut projects = HashSet::new();
     let mut actions = HashSet::new();
+
     for tag in tags {
         let tag = tag.trim();
         if let Ok(action) = tag.parse::<Action>() {
@@ -60,7 +60,7 @@ pub fn parse_activity<'a>(date: &str, input: &'a str) -> IResult<&'a str, Activi
             start_datetime,
             end_datetime,
             description: description.to_string(),
-            actions,
+            action: actions.into_iter().next().unwrap_or(Action::Unknown),
             projects,
         },
     ))
@@ -70,45 +70,35 @@ pub fn parse_activity<'a>(date: &str, input: &'a str) -> IResult<&'a str, Activi
 mod tests {
     use super::*;
     use crate::activity::Action;
+    use chrono::NaiveDate;
 
     #[test]
     fn test_parse_activity() {
         let target_act = Activity {
-            start_datetime: NaiveDateTime::parse_from_str("2022-02-05 12:00", "%Y-%m-%d %H:%M")
-                .unwrap(),
-            end_datetime: NaiveDateTime::parse_from_str("2022-02-05 13:00", "%Y-%m-%d %H:%M")
-                .unwrap(),
+            start_datetime: NaiveDate::from_ymd(2022, 7, 5).and_hms(12, 0, 0),
+            end_datetime: NaiveDate::from_ymd(2022, 7, 5).and_hms(13, 0, 0),
             description: "description".to_string(),
-            projects: vec!["tag2".to_string(), "tag3".to_string()]
-                .into_iter()
-                .collect(),
-            actions: vec![Action::Review].into_iter().collect(),
+            action: Action::Review,
+            projects: ["tag2".to_string(), "tag3".to_string()].into(),
         };
         let target_act_dash = Activity {
-            start_datetime: NaiveDateTime::parse_from_str("2022-02-05 12:00", "%Y-%m-%d %H:%M")
-                .unwrap(),
-            end_datetime: NaiveDateTime::parse_from_str("2022-02-05 13:00", "%Y-%m-%d %H:%M")
-                .unwrap(),
+            start_datetime: NaiveDate::from_ymd(2022, 7, 5).and_hms(12, 0, 0),
+            end_datetime: NaiveDate::from_ymd(2022, 7, 5).and_hms(13, 0, 0),
             description: "description".to_string(),
-            projects: vec![
-                "re-tash-yo".to_string(),
+            action: Action::Code,
+            projects: [
                 "tag2".to_string(),
                 "tag3".to_string(),
+                "re-tash-yo".to_string(),
             ]
-            .into_iter()
-            .collect(),
-            actions: HashSet::new(),
+            .into(),
         };
         let target_act_spaces = Activity {
-            start_datetime: NaiveDateTime::parse_from_str("2022-02-05 12:00", "%Y-%m-%d %H:%M")
-                .unwrap(),
-            end_datetime: NaiveDateTime::parse_from_str("2022-02-05 13:00", "%Y-%m-%d %H:%M")
-                .unwrap(),
+            start_datetime: NaiveDate::from_ymd(2022, 7, 5).and_hms(12, 0, 0),
+            end_datetime: NaiveDate::from_ymd(2022, 7, 5).and_hms(13, 0, 0),
             description: "description of my tests".to_string(),
-            projects: vec!["tag2".to_string(), "tag3".to_string()]
-                .into_iter()
-                .collect(),
-            actions: vec![Action::Review].into_iter().collect(),
+            action: Action::Review,
+            projects: ["tag2".to_string(), "tag3".to_string()].into(),
         };
 
         let test_cases = vec![
@@ -144,7 +134,7 @@ mod tests {
             ),
             (
                 "dash in tag",
-                "12h00-13h00: [re-tash-yo][tag2][tag3] description",
+                "12h00-13h00: [re-tash-yo][tag2][tag3][code] description",
                 &target_act_dash,
             ),
             (
@@ -155,7 +145,7 @@ mod tests {
         ];
 
         for tc in test_cases {
-            let act = parse_activity("2022.02.05", tc.1).unwrap().1;
+            let act = parse_activity("2022.07.05", tc.1).unwrap().1;
             assert_eq!(&act, tc.2, "{} could not be parsed", tc.0);
         }
     }

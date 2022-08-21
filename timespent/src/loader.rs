@@ -4,7 +4,7 @@ use eyre::Result;
 use std::fs::{read_dir, File};
 use std::io::{prelude::*, BufReader};
 
-pub fn load(path: &str) -> Result<Activities> {
+pub fn load_from_filepath(path: &str) -> Result<Activities> {
     let mut activities = Vec::new();
     let files = read_dir(path)?;
 
