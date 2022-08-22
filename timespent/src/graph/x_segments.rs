@@ -43,6 +43,7 @@ impl std::fmt::Display for XSegment {
 }
 
 #[derive(PartialEq, Eq, Debug, Deserialize, Serialize, Clone, TS)]
+#[ts(export)]
 pub struct ScaleXSegments(pub HashMap<Scale, XSegments>);
 
 impl ScaleXSegments {

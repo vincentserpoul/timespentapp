@@ -60,6 +60,7 @@ pub struct Activity {
 }
 
 #[derive(Eq, PartialEq, Debug, Clone, Deserialize, Serialize, TS)]
+#[ts(export)]
 pub struct Activities(pub Vec<Activity>);
 
 #[derive(Eq, PartialEq, Debug, Clone, Deserialize, Serialize, TS)]
