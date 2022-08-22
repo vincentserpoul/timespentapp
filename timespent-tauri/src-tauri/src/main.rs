@@ -13,71 +13,53 @@ use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 
 use timespent::{
-    activity::Activities,
-    aggregates::{Aggregatable, Aggregates},
-    filter::{Filter, Filterable},
-    loader,
+    graph::ui::{Filter, Graph, ScaleXSegments, YActivities},
+    loader, ActivitiesAggregate,
 };
 
 use tauri::State;
 
-struct StateContainer(Arc<Mutex<TimeSpentState>>);
-
-#[derive(Eq, PartialEq, Debug, Deserialize, Serialize)]
-struct TimeSpentState {
-    activities: Activities,
-    filter: Filter,
-    filtered_activities: Activities,
-    aggregates: Aggregates,
-}
+struct StateContainer(Arc<Mutex<Graph>>);
 
 fn main() {
     let directory = "../../timespent/tests/days";
-    let activities = loader::load(directory).unwrap();
-    let filter = Filter::new(&activities);
-    let filtered_activities = activities.clone();
-    let activities_agg = activities.aggregate();
-    let aggregates = activities_agg.over_specific_days(&filter.min_date, &filter.max_date);
+    let activities = loader::load_from_filepath(directory).unwrap();
+    let graph = Graph::new(&activities);
 
-    let state = Arc::new(Mutex::new(TimeSpentState {
-        activities,
-        filter,
-        filtered_activities,
-        aggregates,
-    }));
+    let state = Arc::new(Mutex::new(graph));
 
     tauri::Builder::default()
         .manage(StateContainer(state))
-        .invoke_handler(tauri::generate_handler![get_curr_state, apply_filter])
+        .invoke_handler(tauri::generate_handler![apply_filter])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
 #[tauri::command]
-fn apply_filter(
-    timespent_state: State<'_, StateContainer>,
-    filter: Filter,
-) -> (Filter, Aggregates) {
-    let mut state = timespent_state
-        .0
-        .lock()
-        .expect("connection not initialize; use the `connect` command first");
+fn get_graph_at_scale(
+    state: tauri::State<StateContainer>,
+    scale: &Scale,
+) -> (ScaleXSegments, YActivities) {
+    let graph = state.0.lock().unwrap();
 
-    state.filter = filter;
-    state.filtered_activities = state.activities.filter(&state.filter);
-    let activities_agg = state.filtered_activities.aggregate();
-    state.aggregates =
-        activities_agg.over_specific_days(&state.filter.min_date, &state.filter.max_date);
-
-    (state.filter.clone(), state.aggregates.clone())
+    (
+        graph.filtered_per_scale_x_segments[scale],
+        graph.filtered_per_scale_y_activities[scale],
+    )
 }
 
 #[tauri::command]
-fn get_curr_state(timespent_state: State<'_, StateContainer>) -> (Filter, Aggregates) {
-    let state = timespent_state
+fn get_filter(state: tauri::State<StateContainer>) -> (ActivitiesAggregate, Filter) {
+    let graph = state.0.lock().unwrap();
+    (graph.activities_aggregate, graph.applied_filter)
+}
+
+#[tauri::command]
+fn apply_filter(graph: State<'_, StateContainer>, filter: Filter) {
+    let mut graph = graph
         .0
         .lock()
         .expect("connection not initialize; use the `connect` command first");
 
-    (state.filter.clone(), state.aggregates.clone())
+    graph.apply_filter(&filter);
 }

@@ -7,7 +7,6 @@ use ts_rs::TS;
 
 #[derive(PartialEq, Eq, Debug, Deserialize, Serialize, Clone, TS)]
 #[ts(export)]
-
 pub struct YActivities {
     pub scale_total_minutes: HashMap<Scale, Vec<i64>>,
     pub scale_actions_total_minutes: HashMap<Scale, HashMap<Action, Vec<i64>>>,
