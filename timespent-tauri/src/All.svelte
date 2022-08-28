@@ -1,22 +1,22 @@
 <script lang="ts">
-  import type { AllAggregate } from "../../timespent/bindings/AllAggregate";
+  import type { YActivities } from "../../timespent/bindings/YActivities";
 
-  export let all: AllAggregate;
+  export let projects: [string, number][] = [];
+  export let actions: [string, number][] = [];
 </script>
 
 <div>
   <h2>all</h2>
-  total hours: {all.total_minutes}
   <h3>projects</h3>
   <ul>
-    {#each Object.entries(all.project_minutes) as p}
-      <li>{p[0]}: {p[1]}</li>
+    {#each projects as project}
+      <li>{project[0]}: {project[1]}%</li>
     {/each}
   </ul>
   <h3>actions</h3>
   <ul>
-    {#each Object.entries(all.action_minutes) as a}
-      <li>{a[0]}: {a[1]}</li>
+    {#each actions as action}
+      <li>{action[0]}: {action[1]}%</li>
     {/each}
   </ul>
 </div>

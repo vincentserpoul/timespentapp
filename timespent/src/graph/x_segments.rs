@@ -12,8 +12,6 @@ pub struct XSegment {
     pub end_datetime: NaiveDateTime,
 }
 
-pub type XSegments = Vec<XSegment>;
-
 impl std::fmt::Display for XSegment {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self.scale {
@@ -44,7 +42,7 @@ impl std::fmt::Display for XSegment {
 
 #[derive(PartialEq, Eq, Debug, Deserialize, Serialize, Clone, TS)]
 #[ts(export)]
-pub struct ScaleXSegments(pub HashMap<Scale, XSegments>);
+pub struct ScaleXSegments(pub HashMap<Scale, Vec<XSegment>>);
 
 impl ScaleXSegments {
     pub fn new(start_date: &NaiveDate, end_date: &NaiveDate) -> ScaleXSegments {
@@ -147,7 +145,7 @@ impl ScaleXSegments {
     }
 
     pub fn filter_by_date(&self, start_date: &NaiveDate, end_date: &NaiveDate) -> ScaleXSegments {
-        let mut x_segments: HashMap<Scale, XSegments> = HashMap::new();
+        let mut x_segments: HashMap<Scale, Vec<XSegment>> = HashMap::new();
 
         self.0.iter().for_each(|(scale, scale_x_segments)| {
             let mut filtered_x_segments = Vec::new();

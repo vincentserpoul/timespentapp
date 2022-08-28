@@ -1,30 +1,47 @@
 <script lang="ts">
+  import type { ActivitiesAggregate } from "../../timespent/bindings/ActivitiesAggregate";
   import type { Filter } from "../../timespent/bindings/Filter";
-  import Project from "./Project.svelte";
-  import Action from "./Action.svelte";
 
-  export let filter: Filter;
+  // When using the Tauri API npm package:
+  import { invoke } from "@tauri-apps/api/tauri";
+
+  async function getFilter(): Promise<[ActivitiesAggregate, Filter]> {
+    let res = await invoke("get_filter", {});
+
+    return [res[0] as ActivitiesAggregate, res[1] as Filter];
+  }
+
+  import ProjectComponent from "./Project.svelte";
+  import ActionComponent from "./Action.svelte";
 </script>
 
-<div>
-  <h1>filter</h1>
-  {filter.min_date}-{filter.max_date}:
-  {#if filter}
-    <ul>
-      {#each filter.projects as project}
-        <li>
-          <Project {project} />
-        </li>
-      {/each}
-    </ul>
-  {/if}
-  {#if filter}
-    <ul>
-      {#each filter.actions as action}
-        <li>
-          <Action {action} />
-        </li>
-      {/each}
-    </ul>
-  {/if}
-</div>
+{#await getFilter() then [activitiesAggregate, filter]}
+  <div>
+    <h1>filter</h1>
+    {activitiesAggregate[0]}-{activitiesAggregate[1]}:
+    {#if filter}
+      <ul>
+        {#each activitiesAggregate[3] as project}
+          <li>
+            <ProjectComponent {project} />
+            {#if !filter.projects.includes(project)}
+              *
+            {/if}
+          </li>
+        {/each}
+      </ul>
+      {#if filter}
+        <ul>
+          {#each activitiesAggregate[2] as action}
+            <li>
+              <ActionComponent {action} />
+              {#if !filter.actions.includes(action)}
+                *
+              {/if}
+            </li>
+          {/each}
+        </ul>
+      {/if}
+    {/if}
+  </div>
+{/await}

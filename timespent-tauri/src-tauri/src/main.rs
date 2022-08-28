@@ -9,57 +9,65 @@
     windows_subsystem = "windows"
 )]
 
-use serde::{Deserialize, Serialize};
-use std::sync::{Arc, Mutex};
+// use serde::{Deserialize, Serialize};
+use std::sync::RwLock;
 
 use timespent::{
-    graph::ui::{Filter, Graph, ScaleXSegments, YActivities},
-    loader, ActivitiesAggregate,
+    activity::ActivitiesAggregate,
+    graph::ui::{Filter, Graph},
+    graph::x_segments::ScaleXSegments,
+    graph::y_activities::YActivities,
+    loader,
 };
 
-use tauri::State;
-
-struct StateContainer(Arc<Mutex<Graph>>);
+pub struct StateContainer(pub RwLock<Graph>);
 
 fn main() {
     let directory = "../../timespent/tests/days";
     let activities = loader::load_from_filepath(directory).unwrap();
     let graph = Graph::new(&activities);
 
-    let state = Arc::new(Mutex::new(graph));
-
     tauri::Builder::default()
-        .manage(StateContainer(state))
-        .invoke_handler(tauri::generate_handler![apply_filter])
+        .manage(StateContainer(RwLock::new(graph)))
+        .invoke_handler(tauri::generate_handler![
+            get_graph,
+            get_filter,
+            apply_filter
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
 #[tauri::command]
-fn get_graph_at_scale(
-    state: tauri::State<StateContainer>,
-    scale: &Scale,
-) -> (ScaleXSegments, YActivities) {
-    let graph = state.0.lock().unwrap();
+fn get_graph(state: tauri::State<StateContainer>) -> (ScaleXSegments, YActivities) {
+    let graph = state.0.read().unwrap();
 
     (
-        graph.filtered_per_scale_x_segments[scale],
-        graph.filtered_per_scale_y_activities[scale],
+        graph.filtered_per_scale_x_segments.clone(),
+        graph.filtered_per_scale_y_activities.clone(),
     )
 }
 
 #[tauri::command]
 fn get_filter(state: tauri::State<StateContainer>) -> (ActivitiesAggregate, Filter) {
-    let graph = state.0.lock().unwrap();
-    (graph.activities_aggregate, graph.applied_filter)
+    let graph = state.0.read().unwrap();
+
+    (
+        graph.activities_aggregate.clone(),
+        graph.applied_filter.clone(),
+    )
 }
 
 #[tauri::command]
-fn apply_filter(graph: State<'_, StateContainer>, filter: Filter) {
-    let mut graph = graph
-        .0
-        .lock()
-        .expect("connection not initialize; use the `connect` command first");
-
+fn apply_filter(
+    state: tauri::State<StateContainer>,
+    filter: Filter,
+) -> (ActivitiesAggregate, Filter) {
+    let mut graph = state.0.write().unwrap();
     graph.apply_filter(&filter);
+
+    (
+        graph.activities_aggregate.clone(),
+        graph.applied_filter.clone(),
+    )
 }

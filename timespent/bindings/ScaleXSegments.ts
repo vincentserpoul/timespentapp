@@ -2,4 +2,4 @@
 import type { Scale } from "./Scale";
 import type { XSegment } from "./XSegment";
 
-export type ScaleXSegments = Record<Scale, Array>;
+export type ScaleXSegments = Record<Scale, Array<XSegment>>;
