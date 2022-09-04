@@ -11,8 +11,7 @@
     return [res[0] as ActivitiesAggregate, res[1] as Filter];
   }
 
-  import ProjectComponent from "./Project.svelte";
-  import ActionComponent from "./Action.svelte";
+  import ActivityButton from "./ActivityButton.svelte";
 </script>
 
 {#await getFilter() then [activitiesAggregate, filter]}
@@ -20,22 +19,22 @@
     <h1>filter</h1>
     {activitiesAggregate[0]}-{activitiesAggregate[1]}:
     {#if filter}
-      <ul>
+      <ul class="activity-filter">
         {#each activitiesAggregate[3] as project}
           <li>
-            <ProjectComponent {project} />
-            {#if !filter.projects.includes(project)}
+            <ActivityButton activity={project} />
+            {#if filter.projects.includes(project)}
               *
             {/if}
           </li>
         {/each}
       </ul>
       {#if filter}
-        <ul>
+        <ul class="activity-filter">
           {#each activitiesAggregate[2] as action}
             <li>
-              <ActionComponent {action} />
-              {#if !filter.actions.includes(action)}
+              <ActivityButton activity={action} />
+              {#if filter.actions.includes(action)}
                 *
               {/if}
             </li>
@@ -45,3 +44,11 @@
     {/if}
   </div>
 {/await}
+
+<style>
+  ul.activity-filter li {
+    display: inline;
+    list-style-type: none;
+    padding-right: 20px;
+  }
+</style>

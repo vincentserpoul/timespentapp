@@ -1,21 +1,21 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Chart from "chart.js/auto";
+  import stringToColor from "./stringToColor";
 
-  import type { Action } from "../../timespent/bindings/Action";
   export let labels: string[];
-  export let action_percents: [string, number[]];
-  export let project_percents: [string, number[]];
+  export let activity_percents: [string, number[]];
 
   let lines;
 
   const data = {
     labels: labels,
-    datasets: action_percents.concat(project_percents).map(([name, vals]) => {
+    datasets: activity_percents.map(([name, vals]) => {
       return {
         label: name,
         data: vals,
         borderWidth: 3,
+        borderColor: stringToColor(String(name)),
       };
     }),
   };
@@ -29,19 +29,18 @@
       spacing: 2,
       plugins: {
         legend: {
-          position: "bottom",
+          position: "top",
           display: true,
+          align: "center",
+          padding: 10,
           labels: {
             usePointStyle: true,
+            pointStyle: "star",
             padding: 20,
             font: {
-              size: 14,
+              size: 18,
             },
           },
-        },
-        title: {
-          display: true,
-          text: "My Personal Portfolio",
         },
       },
     },
