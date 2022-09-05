@@ -14,7 +14,7 @@
       return {
         label: name,
         data: vals,
-        borderWidth: 3,
+        borderWidth: 4,
         borderColor: stringToColor(String(name)),
       };
     }),
@@ -29,7 +29,7 @@
       spacing: 2,
       plugins: {
         legend: {
-          position: "top",
+          position: "bottom",
           display: true,
           align: "center",
           padding: 10,
@@ -37,8 +37,9 @@
             usePointStyle: true,
             pointStyle: "star",
             padding: 20,
+            color: "white",
             font: {
-              size: 18,
+              size: 20,
             },
           },
         },
@@ -46,13 +47,30 @@
     },
   };
 
+  let myChart;
+
   onMount(async () => {
     const ctx = lines.getContext("2d");
     // Initialize chart using default config set
-    var myChart = new Chart(ctx, config);
+    myChart = await new Chart(ctx, config);
   });
+
+  $: {
+    if (myChart !== undefined && myChart.data !== undefined) {
+      myChart.data.labels = labels;
+
+      myChart.data.datasets = activity_percents.map(([name, vals]) => {
+        return {
+          label: name,
+          data: vals,
+          borderWidth: 4,
+          borderColor: stringToColor(String(name)),
+        };
+      });
+
+      myChart.update();
+    }
+  }
 </script>
 
-<div class="card bg-gradient-info">
-  <canvas id="myChart" height="100" bind:this={lines} />
-</div>
+<canvas id="myChart" height="100" bind:this={lines} />

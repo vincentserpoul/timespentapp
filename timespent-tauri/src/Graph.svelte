@@ -1,18 +1,12 @@
 <script lang="ts">
   import type { ScaleXSegments } from "../../timespent/bindings/ScaleXSegments";
   import type { YActivities } from "../../timespent/bindings/YActivities";
+  import type { Scale } from "../../timespent/bindings/Scale";
 
-  // When using the Tauri API npm package:
-  import { invoke } from "@tauri-apps/api/tauri";
-
-  async function getGraph(): Promise<[Number, ScaleXSegments, YActivities]> {
-    let [scale_x_segments, y_activities]: [ScaleXSegments, YActivities] =
-      await invoke("get_graph", {});
-    let total_minutes_all = Number(y_activities.scale_total_minutes["All"][0]);
-    return [total_minutes_all, scale_x_segments, y_activities];
-  }
-
-  export let selected_scale;
+  export let selected_scale: Scale;
+  export let total_minutes_all: Number;
+  export let scale_x_segments: ScaleXSegments;
+  export let y_activities: YActivities;
 
   import Lines from "./Lines.svelte";
   import Camembert from "./Camembert.svelte";
@@ -31,120 +25,138 @@
 </script>
 
 <div class="grid-container">
-  {#await getGraph() then [total_minutes, scaleXSegments, yActivities]}
-    <div class="grid-item title"><h1>projects</h1></div>
-    <div class="grid-item doughnut-projects">
-      <Camembert
-        activity_percents={Object.entries(
-          yActivities.scale_projects_total_minutes["All"]
-        )
-          .map((activity) => [
-            activity[0],
-            Math.round((Number(activity[1][0]) * 100) / Number(total_minutes)),
-          ])
-          .reduce(
-            (acc, activity) => {
-              acc.labels.push(activity[0]);
-              acc.values.push(activity[1]);
-              return acc;
-            },
-            { labels: [], values: [] }
-          )}
-      />
-    </div>
-    <div class="grid-item graph-projects">
-      <Lines
-        labels={scaleXSegments[selected_scale].map(
-          (x_segment) => x_segment.start_datetime
-        )}
-        activity_percents={Object.entries(
-          yActivities.scale_projects_total_minutes[selected_scale]
-        ).map(([name, durations]) => [
-          name,
-          calcActivityPercents(
-            yActivities.scale_total_minutes[selected_scale],
-            durations
+  <div class="grid-item title projects">
+    <h1>projects</h1>
+  </div>
+  <div class="grid-item doughnut projects">
+    <Camembert
+      activity_percents={Object.entries(
+        y_activities.scale_projects_total_minutes["All"]
+      )
+        .map((activity) => [
+          activity[0],
+          Math.round(
+            (Number(activity[1][0]) * 100) / Number(total_minutes_all)
           ),
-        ])}
-      />
-    </div>
-    <div class="grid-item title"><h1>actions</h1></div>
-    <div class="grid-item doughnut-actions">
-      <Camembert
-        activity_percents={Object.entries(
-          yActivities.scale_actions_total_minutes["All"]
-        )
-          .map((activity) => [
-            activity[0],
-            Math.round((Number(activity[1][0]) * 100) / Number(total_minutes)),
-          ])
-          .reduce(
-            (acc, activity) => {
-              acc.labels.push(activity[0]);
-              acc.values.push(activity[1]);
-              return acc;
-            },
-            { labels: [], values: [] }
-          )}
-      />
-    </div>
-    <div class="grid-item graph-actions">
-      <Lines
-        labels={scaleXSegments[selected_scale].map(
-          (x_segment) => x_segment.start_datetime
+        ])
+        .reduce(
+          (acc, activity) => {
+            acc.labels.push(activity[0]);
+            acc.values.push(activity[1]);
+            return acc;
+          },
+          { labels: [], values: [] }
         )}
-        activity_percents={Object.entries(
-          yActivities.scale_actions_total_minutes[selected_scale]
-        ).map(([name, durations]) => [
-          name,
-          calcActivityPercents(
-            yActivities.scale_total_minutes[selected_scale],
-            durations
+    />
+  </div>
+  <div class="grid-item graph projects">
+    <Lines
+      labels={scale_x_segments[selected_scale].map(
+        (x_segment) => x_segment.start_datetime
+      )}
+      activity_percents={Object.entries(
+        y_activities.scale_projects_total_minutes[selected_scale]
+      ).map(([name, durations]) => [
+        name,
+        calcActivityPercents(
+          y_activities.scale_total_minutes[selected_scale],
+          durations
+        ),
+      ])}
+    />
+  </div>
+  <div class="grid-item title actions"><h1>activities</h1></div>
+  <div class="grid-item doughnut actions">
+    <Camembert
+      activity_percents={Object.entries(
+        y_activities.scale_actions_total_minutes["All"]
+      )
+        .map((activity) => [
+          activity[0],
+          Math.round(
+            (Number(activity[1][0]) * 100) / Number(total_minutes_all)
           ),
-        ])}
-      />
-    </div>
-  {/await}
+        ])
+        .reduce(
+          (acc, activity) => {
+            acc.labels.push(activity[0]);
+            acc.values.push(activity[1]);
+            return acc;
+          },
+          { labels: [], values: [] }
+        )}
+    />
+  </div>
+  <div class="grid-item graph actions">
+    <Lines
+      labels={scale_x_segments[selected_scale].map(
+        (x_segment) => x_segment.start_datetime
+      )}
+      activity_percents={Object.entries(
+        y_activities.scale_actions_total_minutes[selected_scale]
+      ).map(([name, durations]) => [
+        name,
+        calcActivityPercents(
+          y_activities.scale_total_minutes[selected_scale],
+          durations
+        ),
+      ])}
+    />
+  </div>
 </div>
 
 <style>
   .grid-container {
     display: grid;
-    gap: 10px;
-    background-color: #2196f3;
-    padding: 10px;
-    border: 10px solid red;
+    gap: 2em;
   }
 
   .grid-item {
-    background-color: rgba(255, 255, 255, 0.8);
-    text-align: center;
-    padding: 20px;
-    font-size: 30px;
+    padding: 10px;
+    border-radius: 1em;
   }
 
   .title {
-    grid-column: 1 / span 2;
+    margin-top: 2em;
+    grid-column-start: 1;
+    grid-column-end: 24;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+
+  .doughnut {
+    grid-column-start: 1;
+    grid-column-end: 3;
+  }
+
+  .graph {
+    grid-column-start: 4;
+    grid-column-end: 24;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 2em;
+  }
+
+  .title.projects {
     grid-row: 1;
   }
 
-  .doughnut-projects {
-    grid-column: 1;
+  .doughnut.projects {
     grid-row: 2;
   }
 
-  .graph-projects {
-    grid-column: 1;
+  .graph.projects {
     grid-row: 2;
   }
 
-  .doughnut-actions {
-    grid-column: 1;
-    grid-row: 2;
+  .title.actions {
+    grid-row: 3;
   }
 
-  .graph-actions {
-    grid-column: 1;
-    grid-row: 2;
+  .doughnut.actions {
+    grid-row: 4;
+  }
+
+  .graph.actions {
+    grid-row: 4;
   }
 </style>

@@ -20,13 +20,13 @@
     type: "doughnut",
     data: data,
     options: {
-      borderRadius: "10",
+      borderRadius: "2",
       responsive: true,
-      cutout: "20%",
-      spacing: 1,
+      cutout: "50%",
+      spacing: 0,
+      borderWidth: 0,
       plugins: {
         legend: {
-          position: "bottom",
           display: false,
         },
       },
