@@ -5,7 +5,7 @@
 
   export let selected_scale: Scale;
   export let total_minutes_all: Number;
-  export let scale_x_segments: ScaleXSegments;
+  export let labels: string[];
   export let y_activities: YActivities;
 
   import Lines from "./Lines.svelte";
@@ -51,9 +51,7 @@
   </div>
   <div class="grid-item graph projects">
     <Lines
-      labels={scale_x_segments[selected_scale].map(
-        (x_segment) => x_segment.start_datetime
-      )}
+      {labels}
       activity_percents={Object.entries(
         y_activities.scale_projects_total_minutes[selected_scale]
       ).map(([name, durations]) => [
@@ -89,9 +87,7 @@
   </div>
   <div class="grid-item graph actions">
     <Lines
-      labels={scale_x_segments[selected_scale].map(
-        (x_segment) => x_segment.start_datetime
-      )}
+      {labels}
       activity_percents={Object.entries(
         y_activities.scale_actions_total_minutes[selected_scale]
       ).map(([name, durations]) => [
@@ -117,7 +113,6 @@
   }
 
   .title {
-    margin-top: 2em;
     grid-column-start: 1;
     grid-column-end: 24;
     text-align: center;

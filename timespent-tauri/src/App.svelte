@@ -4,15 +4,12 @@
   import type { ScaleXSegments } from "../../timespent/bindings/ScaleXSegments";
   import type { YActivities } from "../../timespent/bindings/YActivities";
 
-  import ScalesComponent from "./Scales.svelte";
   import FilterComponent from "./Filter.svelte";
   import GraphComponent from "./Graph.svelte";
 
   import { selected_scale } from "./stores";
 
-  // When using the Tauri API npm package:
   import { invoke } from "@tauri-apps/api/tauri";
-
   async function getGraph(): Promise<[Number, ScaleXSegments, YActivities]> {
     let [scale_x_segments, y_activities]: [ScaleXSegments, YActivities] =
       await invoke("get_graph", {});
@@ -25,27 +22,43 @@
 
     return [res[0] as ActivitiesAggregate, res[1] as Filter];
   }
+
+  let total_minutes_all: Number;
+  let scale_x_segments: ScaleXSegments;
+  let labels: string[];
+  let y_activities: YActivities;
+  let activitiesAggregate: ActivitiesAggregate;
+  let filter: Filter;
+
+  import { onMount } from "svelte";
+  onMount(async () => {
+    [total_minutes_all, scale_x_segments, y_activities] = await getGraph();
+    [activitiesAggregate, filter] = await getFilter();
+  });
+
+  $: {
+    if (scale_x_segments !== undefined) {
+      labels = scale_x_segments[$selected_scale].map(
+        (x_segment) => x_segment.start_datetime
+      );
+    }
+  }
 </script>
 
 <main>
-  <div id="scales">
-    <ScalesComponent />
-  </div>
-  {#await getGraph() then [total_minutes_all, scale_x_segments, y_activities]}
+  {#if total_minutes_all > 0}
     <div id="charts">
       <GraphComponent
         selected_scale={$selected_scale}
         {total_minutes_all}
-        {scale_x_segments}
+        {labels}
         {y_activities}
       />
     </div>
-  {/await}
-  {#await getFilter() then [activitiesAggregate, filter]}
     <div id="filter">
-      <FilterComponent {activitiesAggregate} {filter} />
+      <FilterComponent {labels} {activitiesAggregate} {filter} />
     </div>
-  {/await}
+  {/if}
 </main>
 
 <style>

@@ -26,11 +26,8 @@
 <style>
   ul.scale-list {
     list-style: none;
-    padding: 1em;
     list-style-type: none;
     text-align: center;
-    border: 1px white dashed;
-    border-radius: 1em;
   }
 
   ul.scale-list li {
@@ -39,7 +36,7 @@
     width: 10em;
     padding: 1em;
     text-transform: lowercase;
-    margin: 1em;
+    margin: 0 1em 0 1em;
     border: 1px solid white;
     border-radius: 1em;
   }

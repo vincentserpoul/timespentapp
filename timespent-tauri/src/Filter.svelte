@@ -1,11 +1,16 @@
 <script lang="ts">
   import type { ActivitiesAggregate } from "../../timespent/bindings/ActivitiesAggregate";
   import type { Filter } from "../../timespent/bindings/Filter";
+  import type { ScaleXSegments } from "../../timespent/bindings/ScaleXSegments";
+  import type { Scale } from "../../timespent/bindings/Scale";
 
+  export let labels: string[];
   export let activitiesAggregate: ActivitiesAggregate;
   export let filter: Filter;
 
+  import ScalesComponent from "./Scales.svelte";
   import ActivityButton from "./ActivityButton.svelte";
+  import Slider from "./Slider.svelte";
 </script>
 
 <div class="grid-container">
@@ -13,10 +18,18 @@
     <h1>filter</h1>
   </div>
   {#if filter}
-    <div class="grid-item sub-title slider">
-      <h2>time range ({activitiesAggregate[0]}-{activitiesAggregate[1]})</h2>
+    <div class="grid-item sub-title scales">
+      <h2>scale</h2>
     </div>
-    <div class="grid-item sub-values slider">d</div>
+    <div class="grid-item sub-values scales">
+      <ScalesComponent />
+    </div>
+    <div class="grid-item sub-title slider">
+      <h2>time range</h2>
+    </div>
+    <div class="grid-item sub-values slider">
+      <Slider {labels} />
+    </div>
     <div class="grid-item sub-title projects"><h2>projects</h2></div>
     <div class="grid-item sub-values projects">
       <ul class="activity-filter">
@@ -77,16 +90,20 @@
     grid-column-end: 6;
   }
 
-  .slider {
+  .scales {
     grid-row: 2;
   }
 
-  .projects {
+  .slider {
     grid-row: 3;
   }
 
-  .actions {
+  .projects {
     grid-row: 4;
+  }
+
+  .actions {
+    grid-row: 5;
   }
 
   ul.activity-filter li {

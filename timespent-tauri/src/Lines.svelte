@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import Chart from "chart.js/auto";
   import stringToColor from "./stringToColor";
 
@@ -49,6 +48,7 @@
 
   let myChart;
 
+  import { onMount } from "svelte";
   onMount(async () => {
     const ctx = lines.getContext("2d");
     // Initialize chart using default config set
