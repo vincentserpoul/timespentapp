@@ -7,34 +7,41 @@
   import FilterComponent from "./Filter.svelte";
   import GraphComponent from "./Graph.svelte";
 
-  import { selected_scale } from "./stores";
-
-  import { invoke } from "@tauri-apps/api/tauri";
-  async function getGraph(): Promise<[Number, ScaleXSegments, YActivities]> {
-    let [scale_x_segments, y_activities]: [ScaleXSegments, YActivities] =
-      await invoke("get_graph", {});
-    let total_minutes_all = Number(y_activities.scale_total_minutes["All"][0]);
-    return [total_minutes_all, scale_x_segments, y_activities];
-  }
-
-  async function getFilter(): Promise<[ActivitiesAggregate, Filter]> {
-    let res = await invoke("get_filter", {});
-
-    return [res[0] as ActivitiesAggregate, res[1] as Filter];
-  }
-
   let total_minutes_all: Number;
   let scale_x_segments: ScaleXSegments;
   let labels: string[];
   let y_activities: YActivities;
   let activitiesAggregate: ActivitiesAggregate;
-  let filter: Filter;
+
+  import { getGraph as tauriGetGraph } from "./commands";
+  async function syncGraph() {
+    [total_minutes_all, scale_x_segments, y_activities] = await tauriGetGraph();
+  }
+
+  import { getFilter as tauriGetFilter } from "./commands";
+  async function syncFilter() {
+    let retrieved_filter: Filter;
+    [activitiesAggregate, retrieved_filter] = await tauriGetFilter();
+
+    filter.set(retrieved_filter);
+  }
+
+  import { filter } from "./stores";
+  import { applyFilter as tauriApplyFilter } from "./commands";
+  async function applyFilter() {
+    let retrieved_filter: Filter;
+    [activitiesAggregate, retrieved_filter] = await tauriApplyFilter($filter);
+
+    filter.set(retrieved_filter);
+  }
 
   import { onMount } from "svelte";
   onMount(async () => {
-    [total_minutes_all, scale_x_segments, y_activities] = await getGraph();
-    [activitiesAggregate, filter] = await getFilter();
+    await syncGraph();
+    await syncFilter();
   });
+
+  import { selected_scale } from "./stores";
 
   $: {
     if (scale_x_segments !== undefined) {
@@ -56,7 +63,7 @@
       />
     </div>
     <div id="filter">
-      <FilterComponent {labels} {activitiesAggregate} {filter} />
+      <FilterComponent {labels} {activitiesAggregate} {applyFilter} />
     </div>
   {/if}
 </main>

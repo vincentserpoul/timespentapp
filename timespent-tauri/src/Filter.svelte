@@ -4,9 +4,11 @@
   import type { ScaleXSegments } from "../../timespent/bindings/ScaleXSegments";
   import type { Scale } from "../../timespent/bindings/Scale";
 
+  export let applyFilter: () => Promise<void>;
   export let labels: string[];
   export let activitiesAggregate: ActivitiesAggregate;
-  export let filter: Filter;
+
+  import { filter } from "./stores";
 
   import ScalesComponent from "./Scales.svelte";
   import ActivityButton from "./ActivityButton.svelte";
@@ -17,7 +19,7 @@
   <div class="grid-item title">
     <h1>filter</h1>
   </div>
-  {#if filter}
+  {#if activitiesAggregate}
     <div class="grid-item sub-title scales">
       <h2>scale</h2>
     </div>
@@ -28,7 +30,7 @@
       <h2>time range</h2>
     </div>
     <div class="grid-item sub-values slider">
-      <Slider {labels} />
+      <Slider {labels} {applyFilter} />
     </div>
     <div class="grid-item sub-title projects"><h2>projects</h2></div>
     <div class="grid-item sub-values projects">
@@ -37,7 +39,7 @@
           <li>
             <ActivityButton
               activity={project}
-              selected={filter.projects.includes(project)}
+              selected={$filter.projects.includes(project)}
             />
           </li>
         {/each}
@@ -50,7 +52,7 @@
           <li>
             <ActivityButton
               activity={action}
-              selected={filter.actions.includes(action)}
+              selected={$filter.actions.includes(action)}
             />
           </li>
         {/each}

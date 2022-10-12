@@ -5,7 +5,7 @@
 
   export let activity_percents: { labels: string[]; values: number[] };
 
-  let doughnut;
+  let doughnutGraph;
 
   const data = {
     labels: activity_percents.labels,
@@ -34,12 +34,12 @@
   };
 
   onMount(async () => {
-    const ctx = doughnut.getContext("2d");
+    const ctx = doughnutGraph.getContext("2d");
     // Initialize chart using default config set
     var myChart = new Chart(ctx, config);
   });
 </script>
 
 <div class="card bg-gradient-info">
-  <canvas id="myChart" height="100" bind:this={doughnut} />
+  <canvas id="myChart" height="100" bind:this={doughnutGraph} />
 </div>

@@ -10,7 +10,7 @@ keywords = ["timespent", "work", "categories"]
 categories = ["working-tools"]
 
 [dev-dependencies]
-criterion = {version = "^0.3", features = ["html_reports"]}
+criterion = {version = "^0.4", features = ["html_reports"]}
 
 [dependencies]
 nom = "^7"
