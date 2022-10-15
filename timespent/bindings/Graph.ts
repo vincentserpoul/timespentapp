@@ -5,4 +5,4 @@ import type { Filter } from "./Filter";
 import type { ScaleXSegments } from "./ScaleXSegments";
 import type { YActivities } from "./YActivities";
 
-export interface Graph { all_activities: Activities, activities_aggregate: ActivitiesAggregate, applied_filter: Filter, filtered_per_scale_x_segments: ScaleXSegments, filtered_per_scale_y_activities: YActivities, }
+export interface Graph { all_activities: Activities, all_filter: Filter, all_per_scale_x_segments: ScaleXSegments, applied_filter: Filter, filtered_activities_aggregate: ActivitiesAggregate, filtered_per_scale_x_segments: ScaleXSegments, filtered_per_scale_y_activities: YActivities, }

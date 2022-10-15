@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { ScaleXSegments } from "../../timespent/bindings/ScaleXSegments";
   import type { YActivities } from "../../timespent/bindings/YActivities";
   import type { Scale } from "../../timespent/bindings/Scale";
 

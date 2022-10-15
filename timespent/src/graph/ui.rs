@@ -22,38 +22,48 @@ pub struct Filter {
 #[ts(export)]
 pub struct Graph {
     pub all_activities: Activities,
-    pub activities_aggregate: ActivitiesAggregate,
+    pub all_filter: Filter,
+    pub all_per_scale_x_segments: ScaleXSegments,
     pub applied_filter: Filter,
+    pub filtered_activities_aggregate: ActivitiesAggregate,
     pub filtered_per_scale_x_segments: ScaleXSegments,
     pub filtered_per_scale_y_activities: YActivities,
 }
 
 impl Graph {
     pub fn new(all_activities: &Activities) -> Graph {
-        let activities_aggregate = all_activities.aggregate_all();
+        let filtered_activities_aggregate = all_activities.aggregate_all();
         // let ActivitiesAggregate(start_date, end_date, actions, projects) = activities_aggregate;
 
-        let applied_filter = Filter {
-            min_date: activities_aggregate.0,
-            max_date: activities_aggregate.1,
-            actions: activities_aggregate.2.clone(),
-            projects: activities_aggregate.3.clone(),
+        let all_filter = Filter {
+            min_date: filtered_activities_aggregate.0,
+            max_date: filtered_activities_aggregate.1,
+            actions: filtered_activities_aggregate.2.clone(),
+            projects: filtered_activities_aggregate.3.clone(),
             description: None,
         };
 
-        let filtered_per_scale_x_segments =
-            ScaleXSegments::new(&activities_aggregate.0, &activities_aggregate.1);
+        let all_per_scale_x_segments = ScaleXSegments::new(
+            &filtered_activities_aggregate.0,
+            &filtered_activities_aggregate.1,
+        );
+
+        let applied_filter = all_filter.clone();
+
+        let filtered_per_scale_x_segments = all_per_scale_x_segments.clone();
         let filtered_per_scale_y_activities = YActivities::new(
             all_activities,
-            &activities_aggregate.2,
-            &activities_aggregate.3,
+            &filtered_activities_aggregate.2,
+            &filtered_activities_aggregate.3,
             &filtered_per_scale_x_segments,
         );
 
         Graph {
             all_activities: all_activities.clone(),
-            activities_aggregate,
+            all_filter,
+            all_per_scale_x_segments,
             applied_filter,
+            filtered_activities_aggregate,
             filtered_per_scale_x_segments,
             filtered_per_scale_y_activities,
         }
@@ -68,15 +78,15 @@ impl Graph {
             &filter.description,
         );
 
-        self.activities_aggregate = filtered_activities.aggregate_all();
+        self.filtered_activities_aggregate = filtered_activities.aggregate_all();
 
         self.applied_filter = filter.clone();
         self.filtered_per_scale_x_segments =
             ScaleXSegments::new(&filter.min_date, &filter.max_date);
         self.filtered_per_scale_y_activities = YActivities::new(
             &filtered_activities,
-            &self.activities_aggregate.2,
-            &self.activities_aggregate.3,
+            &self.filtered_activities_aggregate.2,
+            &self.filtered_activities_aggregate.3,
             &self.filtered_per_scale_x_segments,
         );
     }
@@ -130,7 +140,7 @@ mod tests {
         let y_act = YActivities::new(&activities, &act_agg.2, &act_agg.3, &sxs);
 
         assert_eq!(graph.all_activities, activities, "all activities");
-        assert_eq!(graph.activities_aggregate, act_agg, "activity agg");
+        assert_eq!(graph.filtered_activities_aggregate, act_agg, "activity agg");
         assert_eq!(graph.applied_filter, filter, "filter");
         assert_eq!(graph.filtered_per_scale_x_segments, sxs, "x segments");
         assert_eq!(graph.filtered_per_scale_y_activities, y_act, "y activities");
@@ -182,7 +192,7 @@ mod tests {
         let y_act = YActivities::new(&filtered_activities, &act_agg.2, &act_agg.3, &sxs);
 
         assert_eq!(graph.all_activities, activities, "all activities");
-        assert_eq!(graph.activities_aggregate, act_agg, "activity agg");
+        assert_eq!(graph.filtered_activities_aggregate, act_agg, "activity agg");
         assert_eq!(graph.applied_filter, filter, "filter");
         assert_eq!(graph.filtered_per_scale_x_segments, sxs, "x segments");
         assert_eq!(graph.filtered_per_scale_y_activities, y_act, "y activities");

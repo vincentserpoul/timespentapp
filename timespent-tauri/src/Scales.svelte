@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Scale } from "../../timespent/bindings/Scale";
+  import type { ScaleXSegments } from "../../timespent/bindings/ScaleXSegments";
 
   const scales: Scale[] = ["Day", "Week", "Month", "Year"];
 

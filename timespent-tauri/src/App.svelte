@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Filter } from "../../timespent/bindings/Filter";
-  import type { ActivitiesAggregate } from "../../timespent/bindings/ActivitiesAggregate";
   import type { ScaleXSegments } from "../../timespent/bindings/ScaleXSegments";
   import type { YActivities } from "../../timespent/bindings/YActivities";
 
@@ -9,30 +8,30 @@
 
   let total_minutes_all: Number;
   let scale_x_segments: ScaleXSegments;
-  let labels: string[];
   let y_activities: YActivities;
-  let activitiesAggregate: ActivitiesAggregate;
 
   import { getGraph as tauriGetGraph } from "./commands";
   async function syncGraph() {
     [total_minutes_all, scale_x_segments, y_activities] = await tauriGetGraph();
   }
 
+  let all_x_labels: ScaleXSegments;
+  let all_filter: Filter;
+
   import { getFilter as tauriGetFilter } from "./commands";
   async function syncFilter() {
-    let retrieved_filter: Filter;
-    [activitiesAggregate, retrieved_filter] = await tauriGetFilter();
+    let applied_filter: Filter;
+    [all_x_labels, all_filter, applied_filter] = await tauriGetFilter();
 
-    filter.set(retrieved_filter);
+    filter.set(applied_filter);
   }
 
   import { filter } from "./stores";
   import { applyFilter as tauriApplyFilter } from "./commands";
   async function applyFilter() {
-    let retrieved_filter: Filter;
-    [activitiesAggregate, retrieved_filter] = await tauriApplyFilter($filter);
+    await tauriApplyFilter($filter);
 
-    filter.set(retrieved_filter);
+    await syncGraph();
   }
 
   import { onMount } from "svelte";
@@ -42,14 +41,7 @@
   });
 
   import { selected_scale } from "./stores";
-
-  $: {
-    if (scale_x_segments !== undefined) {
-      labels = scale_x_segments[$selected_scale].map(
-        (x_segment) => x_segment.start_datetime
-      );
-    }
-  }
+  import { displayedXLabels } from "./display";
 </script>
 
 <main>
@@ -58,12 +50,12 @@
       <GraphComponent
         selected_scale={$selected_scale}
         {total_minutes_all}
-        {labels}
+        labels={displayedXLabels(scale_x_segments[$selected_scale])}
         {y_activities}
       />
     </div>
     <div id="filter">
-      <FilterComponent {labels} {activitiesAggregate} {applyFilter} />
+      <FilterComponent {all_x_labels} {all_filter} {applyFilter} />
     </div>
   {/if}
 </main>

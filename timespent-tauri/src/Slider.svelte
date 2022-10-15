@@ -7,15 +7,13 @@
 
   import { filter } from "./stores";
   $: {
-    if (values[0] !== 0 || values[1] !== labels.length - 1) {
-      filter.update((f) => {
-        f.min_date = labels[values[0]];
-        f.max_date = labels[values[1]];
-        return f;
-      });
+    filter.update((f) => {
+      f.min_date = labels[values[0]];
+      f.max_date = labels[values[1]];
+      return f;
+    });
 
-      applyFilter();
-    }
+    applyFilter();
   }
 </script>
 

@@ -1,6 +1,4 @@
 import type { Filter } from "../../timespent/bindings/Filter";
-import type { Action } from "../../timespent/bindings/Action";
-import type { ActivitiesAggregate } from "../../timespent/bindings/ActivitiesAggregate";
 import type { ScaleXSegments } from "../../timespent/bindings/ScaleXSegments";
 import type { YActivities } from "../../timespent/bindings/YActivities";
 
@@ -15,18 +13,16 @@ export async function getGraph(): Promise<
   return [total_minutes_all, scale_x_segments, y_activities];
 }
 
-export async function getFilter(): Promise<[ActivitiesAggregate, Filter]> {
+export async function getFilter(): Promise<[ScaleXSegments, Filter, Filter]> {
   let res = await invoke("get_filter", {});
 
-  return [res[0] as ActivitiesAggregate, res[1] as Filter];
+  return [res[0] as ScaleXSegments, res[1] as Filter, res[2] as Filter];
 }
 
-export async function applyFilter(
-  ftr: Filter
-): Promise<[ActivitiesAggregate, Filter]> {
-  console.log("applyFilter", ftr);
-  let res = await invoke("apply_filter", {
+export async function applyFilter(ftr: Filter): Promise<void> {
+  await invoke("apply_filter", {
     filter: ftr,
   });
-  return [res[0] as ActivitiesAggregate, res[1] as Filter];
+
+  return;
 }

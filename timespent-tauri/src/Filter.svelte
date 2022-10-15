@@ -1,25 +1,27 @@
 <script lang="ts">
-  import type { ActivitiesAggregate } from "../../timespent/bindings/ActivitiesAggregate";
   import type { Filter } from "../../timespent/bindings/Filter";
   import type { ScaleXSegments } from "../../timespent/bindings/ScaleXSegments";
-  import type { Scale } from "../../timespent/bindings/Scale";
+  import { selected_scale } from "./stores";
+
+  export let all_x_labels: ScaleXSegments;
+  export let all_filter: Filter;
 
   export let applyFilter: () => Promise<void>;
-  export let labels: string[];
-  export let activitiesAggregate: ActivitiesAggregate;
 
   import { filter } from "./stores";
 
   import ScalesComponent from "./Scales.svelte";
   import ActivityButton from "./ActivityButton.svelte";
   import Slider from "./Slider.svelte";
+
+  import { displayedXLabels } from "./display";
 </script>
 
 <div class="grid-container">
   <div class="grid-item title">
     <h1>filter</h1>
   </div>
-  {#if activitiesAggregate}
+  {#if all_x_labels}
     <div class="grid-item sub-title scales">
       <h2>scale</h2>
     </div>
@@ -30,12 +32,15 @@
       <h2>time range</h2>
     </div>
     <div class="grid-item sub-values slider">
-      <Slider {labels} {applyFilter} />
+      <Slider
+        labels={displayedXLabels(all_x_labels[$selected_scale])}
+        {applyFilter}
+      />
     </div>
     <div class="grid-item sub-title projects"><h2>projects</h2></div>
     <div class="grid-item sub-values projects">
       <ul class="activity-filter">
-        {#each activitiesAggregate[3] as project}
+        {#each all_filter.projects as project}
           <li>
             <ActivityButton
               activity={project}
@@ -48,7 +53,7 @@
     <div class="grid-item sub-title actions"><h2>actions</h2></div>
     <div class="grid-item sub-values actions">
       <ul class="activity-filter">
-        {#each activitiesAggregate[2] as action}
+        {#each all_filter.actions as action}
           <li>
             <ActivityButton
               activity={action}

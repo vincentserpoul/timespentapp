@@ -13,7 +13,6 @@
 use std::sync::RwLock;
 
 use timespent::{
-    activity::ActivitiesAggregate,
     graph::ui::{Filter, Graph},
     graph::x_segments::ScaleXSegments,
     graph::y_activities::YActivities,
@@ -49,25 +48,18 @@ fn get_graph(state: tauri::State<StateContainer>) -> (ScaleXSegments, YActivitie
 }
 
 #[tauri::command]
-fn get_filter(state: tauri::State<StateContainer>) -> (ActivitiesAggregate, Filter) {
+fn get_filter(state: tauri::State<StateContainer>) -> (ScaleXSegments, Filter, Filter) {
     let graph = state.0.read().unwrap();
 
     (
-        graph.activities_aggregate.clone(),
+        graph.all_per_scale_x_segments.clone(),
+        graph.all_filter.clone(),
         graph.applied_filter.clone(),
     )
 }
 
 #[tauri::command]
-fn apply_filter(
-    state: tauri::State<StateContainer>,
-    filter: Filter,
-) -> (ActivitiesAggregate, Filter) {
+fn apply_filter(state: tauri::State<StateContainer>, filter: Filter) {
     let mut graph = state.0.write().unwrap();
     graph.apply_filter(&filter);
-
-    (
-        graph.activities_aggregate.clone(),
-        graph.applied_filter.clone(),
-    )
 }
