@@ -1,5 +1,5 @@
 use super::scale::Scale;
-use chrono::{Datelike, Months, NaiveDate, NaiveDateTime, Weekday};
+use chrono::{Datelike, Duration, Months, NaiveDate, NaiveDateTime, Weekday};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use ts_rs::TS;
@@ -46,12 +46,15 @@ pub struct ScaleXSegments(pub HashMap<Scale, Vec<XSegment>>);
 
 impl ScaleXSegments {
     pub fn new(start_date: &NaiveDate, end_date: &NaiveDate) -> ScaleXSegments {
+        let start_datetime = start_date.and_hms(0, 0, 0);
+        let end_datetime = (*end_date + Duration::days(1)).and_hms(0, 0, 0);
+
         let mut x_segments: HashMap<Scale, Vec<XSegment>> = [(
             Scale::All,
             vec![XSegment {
                 scale: Scale::All,
-                start_datetime: start_date.and_hms(0, 0, 0),
-                end_datetime: end_date.and_hms(23, 59, 59),
+                start_datetime,
+                end_datetime,
             }],
         )]
         .into();
@@ -69,7 +72,7 @@ impl ScaleXSegments {
                 let curr_x_segments_day = XSegment {
                     scale: Scale::Day,
                     start_datetime: current_date.and_hms(0, 0, 0),
-                    end_datetime: current_date.and_hms(23, 59, 59),
+                    end_datetime: (current_date + Duration::days(1)).and_hms(0, 0, 0),
                 };
                 if x_segments_day.is_empty()
                     || x_segments_day[x_segments_day.len() - 1] != curr_x_segments_day
@@ -85,12 +88,12 @@ impl ScaleXSegments {
                         Weekday::Mon,
                     )
                     .and_hms(0, 0, 0),
-                    end_datetime: NaiveDate::from_isoywd(
+                    end_datetime: (NaiveDate::from_isoywd(
                         current_date.iso_week().year(),
                         current_date.iso_week().week(),
                         Weekday::Sun,
-                    )
-                    .and_hms(23, 59, 59),
+                    ) + Duration::days(1))
+                    .and_hms(0, 0, 0),
                 };
                 if x_segments_week.is_empty()
                     || x_segments_week[x_segments_week.len() - 1] != curr_x_segments_week
@@ -111,8 +114,7 @@ impl ScaleXSegments {
                         current_date.month(),
                         1,
                     ) + Months::new(1))
-                    .pred()
-                    .and_hms(23, 59, 59),
+                    .and_hms(0, 0, 0),
                 };
                 if x_segments_month.is_empty()
                     || x_segments_month[x_segments_month.len() - 1] != curr_x_segments_month
@@ -124,8 +126,7 @@ impl ScaleXSegments {
                     scale: Scale::Year,
                     start_datetime: NaiveDate::from_ymd(current_date.year(), 1, 1).and_hms(0, 0, 0),
                     end_datetime: NaiveDate::from_ymd(current_date.year() + 1, 1, 1)
-                        .pred()
-                        .and_hms(23, 59, 59),
+                        .and_hms(0, 0, 0),
                 };
                 if x_segments_year.is_empty()
                     || x_segments_year[x_segments_year.len() - 1] != curr_x_segments_year
@@ -151,7 +152,7 @@ impl ScaleXSegments {
             let mut filtered_x_segments = Vec::new();
             for xsegment in scale_x_segments {
                 if xsegment.start_datetime.date() >= *start_date
-                    && xsegment.end_datetime.date() <= *end_date
+                    && xsegment.end_datetime.date() < *end_date
                 {
                     filtered_x_segments.push(xsegment.clone());
                 }
@@ -239,17 +240,17 @@ mod tests {
                 XSegment {
                     scale: Scale::Day,
                     start_datetime: NaiveDate::from_ymd(2022, 12, 31).and_hms(0, 0, 0),
-                    end_datetime: NaiveDate::from_ymd(2022, 12, 31).and_hms(23, 59, 59),
+                    end_datetime: NaiveDate::from_ymd(2023, 1, 1).and_hms(0, 0, 0),
                 },
                 XSegment {
                     scale: Scale::Day,
                     start_datetime: NaiveDate::from_ymd(2023, 1, 1).and_hms(0, 0, 0),
-                    end_datetime: NaiveDate::from_ymd(2023, 1, 1).and_hms(23, 59, 59),
+                    end_datetime: NaiveDate::from_ymd(2023, 1, 2).and_hms(0, 0, 0),
                 },
                 XSegment {
                     scale: Scale::Day,
                     start_datetime: NaiveDate::from_ymd(2023, 1, 2).and_hms(0, 0, 0),
-                    end_datetime: NaiveDate::from_ymd(2023, 1, 2).and_hms(23, 59, 59),
+                    end_datetime: NaiveDate::from_ymd(2023, 1, 3).and_hms(0, 0, 0),
                 },
             ],
             "wrong x_segments for scale day"
@@ -261,12 +262,12 @@ mod tests {
                 XSegment {
                     scale: Scale::Week,
                     start_datetime: NaiveDate::from_ymd(2022, 12, 26).and_hms(0, 0, 0),
-                    end_datetime: NaiveDate::from_ymd(2023, 1, 1).and_hms(23, 59, 59),
+                    end_datetime: NaiveDate::from_ymd(2023, 1, 2).and_hms(0, 0, 0),
                 },
                 XSegment {
                     scale: Scale::Week,
                     start_datetime: NaiveDate::from_ymd(2023, 1, 2).and_hms(0, 0, 0),
-                    end_datetime: NaiveDate::from_ymd(2023, 1, 8).and_hms(23, 59, 59),
+                    end_datetime: NaiveDate::from_ymd(2023, 1, 9).and_hms(0, 0, 0),
                 },
             ],
             "wrong x_segments for scale week"
@@ -278,12 +279,12 @@ mod tests {
                 XSegment {
                     scale: Scale::Month,
                     start_datetime: NaiveDate::from_ymd(2022, 12, 1).and_hms(0, 0, 0),
-                    end_datetime: NaiveDate::from_ymd(2022, 12, 31).and_hms(23, 59, 59),
+                    end_datetime: NaiveDate::from_ymd(2023, 1, 1).and_hms(0, 0, 0),
                 },
                 XSegment {
                     scale: Scale::Month,
                     start_datetime: NaiveDate::from_ymd(2023, 1, 1).and_hms(0, 0, 0),
-                    end_datetime: NaiveDate::from_ymd(2023, 1, 31).and_hms(23, 59, 59),
+                    end_datetime: NaiveDate::from_ymd(2023, 2, 1).and_hms(0, 0, 0),
                 },
             ],
             "wrong x_segments for scale month"
@@ -295,12 +296,12 @@ mod tests {
                 XSegment {
                     scale: Scale::Year,
                     start_datetime: NaiveDate::from_ymd(2022, 1, 1).and_hms(0, 0, 0),
-                    end_datetime: NaiveDate::from_ymd(2022, 12, 31).and_hms(23, 59, 59),
+                    end_datetime: NaiveDate::from_ymd(2023, 1, 1).and_hms(0, 0, 0),
                 },
                 XSegment {
                     scale: Scale::Year,
                     start_datetime: NaiveDate::from_ymd(2023, 1, 1).and_hms(0, 0, 0),
-                    end_datetime: NaiveDate::from_ymd(2023, 12, 31).and_hms(23, 59, 59),
+                    end_datetime: NaiveDate::from_ymd(2024, 1, 1).and_hms(0, 0, 0),
                 },
             ],
             "wrong x_segments for scale year"
@@ -311,7 +312,7 @@ mod tests {
             &vec![XSegment {
                 scale: Scale::All,
                 start_datetime: NaiveDate::from_ymd(2022, 12, 31).and_hms(0, 0, 0),
-                end_datetime: NaiveDate::from_ymd(2023, 1, 2).and_hms(23, 59, 59),
+                end_datetime: NaiveDate::from_ymd(2023, 1, 3).and_hms(0, 0, 0),
             },],
             "wrong x_segments for scale all"
         );

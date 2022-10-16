@@ -32,10 +32,12 @@
       <h2>time range</h2>
     </div>
     <div class="grid-item sub-values slider">
-      <Slider
-        labels={displayedXLabels(all_x_labels[$selected_scale])}
-        {applyFilter}
-      />
+      {#if all_x_labels[$selected_scale].length >= 2}
+        <Slider
+          labels={displayedXLabels(all_x_labels[$selected_scale])}
+          {applyFilter}
+        />
+      {/if}
     </div>
     <div class="grid-item sub-title projects"><h2>projects</h2></div>
     <div class="grid-item sub-values projects">

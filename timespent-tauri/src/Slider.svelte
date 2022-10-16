@@ -2,14 +2,23 @@
   export let labels: string[] = [];
   export let applyFilter: () => Promise<void>;
 
-  let values = [0, labels.length - 1];
+  let localLabels = labels;
+
+  let values = [0, localLabels.length - 1];
+
   import RangeSlider from "svelte-range-slider-pips";
 
   import { filter } from "./stores";
   $: {
+    if (labels !== localLabels) {
+      console.log("labels changed", labels);
+      localLabels = labels;
+      values = [0, localLabels.length - 1];
+    }
+
     filter.update((f) => {
-      f.min_date = labels[values[0]];
-      f.max_date = labels[values[1]];
+      f.min_date = localLabels[values[0]];
+      f.max_date = localLabels[values[1]];
       return f;
     });
 
