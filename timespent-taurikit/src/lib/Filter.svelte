@@ -47,9 +47,30 @@
             <ActivityButton
               activity={project}
               selected={$filter.projects.includes(project)}
+              click={() => {
+                if (
+                  $filter.projects.length === 1 &&
+                  $filter.projects[0] === project
+                ) {
+                  return;
+                }
+                $filter.projects = $filter.projects.includes(project)
+                  ? $filter.projects.filter((p) => p !== project)
+                  : [...$filter.projects, project];
+                applyFilter();
+              }}
             />
           </li>
         {/each}
+        <li>
+          <a
+            class="activity-reset"
+            on:click={() => {
+              $filter.projects = $filter.projects.filter((_, p) => p === 0);
+              applyFilter();
+            }}>SELECT 1 ONLY</a
+          >
+        </li>
       </ul>
     </div>
     <div class="grid-item sub-title actions"><h2>actions</h2></div>
@@ -60,9 +81,30 @@
             <ActivityButton
               activity={action}
               selected={$filter.actions.includes(action)}
+              click={() => {
+                if (
+                  $filter.actions.length === 1 &&
+                  $filter.actions[0] === action
+                ) {
+                  return;
+                }
+                $filter.actions = $filter.actions.includes(action)
+                  ? $filter.actions.filter((a) => a !== action)
+                  : [...$filter.actions, action];
+                applyFilter();
+              }}
             />
           </li>
         {/each}
+        <li>
+          <a
+            class="activity-reset"
+            on:click={() => {
+              $filter.actions = $filter.actions.filter((_, p) => p === 0);
+              applyFilter();
+            }}>SELECT 1 ONLY</a
+          >
+        </li>
       </ul>
     </div>
   {/if}
@@ -119,5 +161,17 @@
     display: inline;
     list-style-type: none;
     padding-right: 20px;
+  }
+
+  .activity-reset {
+    border: 1px solid white;
+    border-radius: 1em;
+    padding: 0.5em;
+    font-size: x-large;
+    text-transform: lowercase;
+    margin: 8px 16px;
+    transition: 0.4s;
+    cursor: pointer;
+    color: white;
   }
 </style>

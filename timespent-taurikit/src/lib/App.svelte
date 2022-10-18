@@ -30,7 +30,6 @@
   import { applyFilter as tauriApplyFilter } from "./commands";
   async function applyFilter() {
     await tauriApplyFilter($filter);
-
     await syncGraph();
   }
 
@@ -63,6 +62,12 @@
 <style>
   main {
     padding: 2em;
+    color: #fff;
+	margin: 0;
+	padding: 8px;
+	box-sizing: border-box;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	background-color: #121212;
   }
 
   #filter {

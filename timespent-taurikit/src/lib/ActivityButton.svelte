@@ -3,22 +3,23 @@
 
   export let activity: string;
   export let selected: boolean;
+  export let click;
+
   const color = stringToColor(activity);
-  const opacity = selected ? "0.9" : "0.4";
+  $: opacity = selected ? "1" : "0.4";
 </script>
 
-<button class="button" href="#" style:background-color={color} style:opacity>
+<!-- svelte-ignore a11y-invalid-attribute -->
+<a class="activity" href="#" style:color style:opacity on:click={click}>
   {activity}
-</button>
+</a>
 
 <style>
-  .button {
-    border-radius: 1em;
-    color: #121212;
+  .activity {
+    font-size: x-large;
     text-transform: lowercase;
-    padding: 16px 32px;
-    text-align: center;
-    transition: 0.6s;
+    margin: 8px 16px;
+    transition: 0.4s;
     cursor: pointer;
   }
 </style>

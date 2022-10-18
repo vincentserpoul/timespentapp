@@ -3,11 +3,11 @@
   "build": {
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
-    "devPath": "http://localhost:8081",
-    "distDir": "../public"
+    "devPath": "http://localhost:5173",
+    "distDir": "../build"
   },
   "package": {
-    "productName": "timespent-tauri",
+    "productName": "timespent-taurikit",
     "version": "0.1.0"
   },
   "tauri": {
@@ -29,7 +29,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.timespent.dev",
+      "identifier": "com.tauri.dev",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -58,9 +58,11 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "timespent",
+        "title": "timespent-taurikit",
         "width": 800
       }
     ]
   }
 }
+
+

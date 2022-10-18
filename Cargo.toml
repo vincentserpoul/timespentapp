@@ -2,5 +2,5 @@
 
 members = [
     "timespent",
-    "timespent-tauri/src-tauri",
+    "timespent-taurikit/src-tauri",
 ]
