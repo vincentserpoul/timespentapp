@@ -3,7 +3,7 @@
 
   export let activity: string;
   export let selected: boolean;
-  export let click;
+  export let click: ()=>void;
 
   const color = stringToColor(activity);
   $: opacity = selected ? "1" : "0.4";
