@@ -48,12 +48,6 @@
               activity={project}
               selected={$filter.projects.includes(project)}
               click={() => {
-                if (
-                  $filter.projects.length === 1 &&
-                  $filter.projects[0] === project
-                ) {
-                  return;
-                }
                 $filter.projects = $filter.projects.includes(project)
                   ? $filter.projects.filter((p) => p !== project)
                   : [...$filter.projects, project];
@@ -66,9 +60,9 @@
           <a
             class="activity-reset"
             on:click={() => {
-              $filter.projects = $filter.projects.filter((_, p) => p === 0);
+              $filter.projects = [];
               applyFilter();
-            }}>SELECT 1 ONLY</a
+            }}>deselect all</a
           >
         </li>
       </ul>
@@ -82,12 +76,6 @@
               activity={action}
               selected={$filter.actions.includes(action)}
               click={() => {
-                if (
-                  $filter.actions.length === 1 &&
-                  $filter.actions[0] === action
-                ) {
-                  return;
-                }
                 $filter.actions = $filter.actions.includes(action)
                   ? $filter.actions.filter((a) => a !== action)
                   : [...$filter.actions, action];
@@ -100,9 +88,9 @@
           <a
             class="activity-reset"
             on:click={() => {
-              $filter.actions = $filter.actions.filter((_, p) => p === 0);
+              $filter.actions = [];
               applyFilter();
-            }}>SELECT 1 ONLY</a
+            }}>deselect all</a
           >
         </li>
       </ul>

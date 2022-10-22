@@ -44,7 +44,7 @@
 </script>
 
 <main>
-  {#if total_minutes_all > 0}
+  {#if all_x_labels}
     <div id="charts">
       <GraphComponent
         selected_scale={$selected_scale}
@@ -60,14 +60,15 @@
 </main>
 
 <style>
+
+
   main {
     padding: 2em;
     color: #fff;
 	margin: 0;
 	padding: 8px;
 	box-sizing: border-box;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-	background-color: #121212;
+background-color: #121212;
   }
 
   #filter {

@@ -11,7 +11,6 @@
   import { filter } from "./stores";
   $: {
     if (labels !== localLabels) {
-      console.log("labels changed", labels);
       localLabels = labels;
       values = [0, localLabels.length - 1];
     }
