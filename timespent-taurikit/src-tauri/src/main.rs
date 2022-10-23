@@ -9,6 +9,22 @@
     windows_subsystem = "windows"
 )]
 
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+struct MyConfig {
+    base_path: String,
+}
+
+/// `MyConfig` implements `Default`
+impl ::std::default::Default for MyConfig {
+    fn default() -> Self {
+        Self {
+            base_path: "../../timespent/tests/days".into(),
+        }
+    }
+}
+
 // use serde::{Deserialize, Serialize};
 use std::sync::RwLock;
 
@@ -22,7 +38,10 @@ use timespent::{
 pub struct StateContainer(pub RwLock<Graph>);
 
 fn main() {
-    let directory = "../../timespent/tests/days";
+    let cfg: MyConfig = confy::load("timespent", Some("config")).unwrap();
+    let directory = &cfg.base_path;
+    println!("Loading data from {}", directory);
+
     let activities = loader::load_from_filepath(directory).unwrap();
     let graph = Graph::new(&activities);
 
