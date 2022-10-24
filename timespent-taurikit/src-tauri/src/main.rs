@@ -49,7 +49,7 @@ fn main() {
     let directory = &cfg.base_path;
     println!("Loading data from {}", directory);
 
-    let activities = loader::load_from_filepath(directory).unwrap();
+    let activities = loader::load_from_filepath(directory).expect("Failed to load data");
     let graph = Graph::new(&activities);
 
     tauri::Builder::default()
