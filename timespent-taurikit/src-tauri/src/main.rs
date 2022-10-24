@@ -37,8 +37,15 @@ use timespent::{
 
 pub struct StateContainer(pub RwLock<Graph>);
 
+const CONFIG_NAME: &str = "config";
+const APP_NAME: &str = "timespent";
+
 fn main() {
-    let cfg: MyConfig = confy::load("timespent", Some("config")).unwrap();
+    println!(
+        "using config path {:?}",
+        confy::get_configuration_file_path(APP_NAME, CONFIG_NAME).unwrap(),
+    );
+    let cfg: MyConfig = confy::load(APP_NAME, Some(CONFIG_NAME)).unwrap();
     let directory = &cfg.base_path;
     println!("Loading data from {}", directory);
 
