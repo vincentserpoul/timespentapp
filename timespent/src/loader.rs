@@ -16,13 +16,14 @@ pub fn load_from_filepath(path: &str) -> Result<Activities> {
         let f = File::open(f.path())?;
         let reader = BufReader::new(f);
 
-        for line in reader.lines() {
-            let line = line?;
-            // println!("{}", line);
-
-            match parse_activity(date, line.clone().as_str()) {
-                Ok((_, activity)) => activities.push(activity),
-                Err(err) => println!("can not parse line: {} {}", line, err),
+        for line_f in reader.lines() {
+            if let Ok(line) = line_f {
+                match parse_activity(date, line.clone().as_str()) {
+                    Ok((_, activity)) => activities.push(activity),
+                    Err(err) => println!("can not parse line: {} {}", line, err),
+                }
+            } else {
+                println!("file {}: can not read line: {:?}", &filename, line_f);
             }
         }
     }
