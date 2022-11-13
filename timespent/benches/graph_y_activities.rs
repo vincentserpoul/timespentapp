@@ -7,29 +7,53 @@ use timespent::graph::y_activities::YActivities;
 pub fn criterion_benchmark(c: &mut Criterion) {
     let activities = Activities(vec![
         Activity {
-            start_datetime: NaiveDate::from_ymd(2015, 7, 22).and_hms(12, 0, 0),
-            end_datetime: NaiveDate::from_ymd(2015, 7, 22).and_hms(13, 0, 0),
+            start_datetime: NaiveDate::from_ymd_opt(2015, 7, 22)
+                .unwrap()
+                .and_hms_opt(12, 0, 0)
+                .unwrap(),
+            end_datetime: NaiveDate::from_ymd_opt(2015, 7, 22)
+                .unwrap()
+                .and_hms_opt(13, 0, 0)
+                .unwrap(),
             description: "activity 1".to_string(),
             action: Action::Code,
             projects: ["tag1".to_string(), "tag2".to_string()].into(),
         },
         Activity {
-            start_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(12, 0, 0),
-            end_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(13, 0, 0),
+            start_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                .unwrap()
+                .and_hms_opt(12, 0, 0)
+                .unwrap(),
+            end_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                .unwrap()
+                .and_hms_opt(13, 0, 0)
+                .unwrap(),
             description: "activity 2".to_string(),
             action: Action::Review,
             projects: ["tag2".to_string(), "tag3".to_string()].into(),
         },
         Activity {
-            start_datetime: NaiveDate::from_ymd(2022, 7, 26).and_hms(12, 0, 0),
-            end_datetime: NaiveDate::from_ymd(2022, 7, 26).and_hms(13, 0, 0),
+            start_datetime: NaiveDate::from_ymd_opt(2022, 7, 26)
+                .unwrap()
+                .and_hms_opt(12, 0, 0)
+                .unwrap(),
+            end_datetime: NaiveDate::from_ymd_opt(2022, 7, 26)
+                .unwrap()
+                .and_hms_opt(13, 0, 0)
+                .unwrap(),
             description: "activity 3".to_string(),
             action: Action::Code,
             projects: ["tag1".to_string(), "tag2".to_string()].into(),
         },
         Activity {
-            start_datetime: NaiveDate::from_ymd(2030, 7, 27).and_hms(12, 0, 0),
-            end_datetime: NaiveDate::from_ymd(2030, 7, 27).and_hms(13, 0, 0),
+            start_datetime: NaiveDate::from_ymd_opt(2030, 7, 27)
+                .unwrap()
+                .and_hms_opt(12, 0, 0)
+                .unwrap(),
+            end_datetime: NaiveDate::from_ymd_opt(2030, 7, 27)
+                .unwrap()
+                .and_hms_opt(13, 0, 0)
+                .unwrap(),
             description: "activity 5".to_string(),
             action: Action::Review,
             projects: ["tag2".to_string(), "tag3".to_string()].into(),
