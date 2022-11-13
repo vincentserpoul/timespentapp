@@ -9,6 +9,15 @@ license = "MIT OR Apache-2.0"
 keywords = ["timespent", "work", "categories"]
 categories = ["working-tools"]
 
+[[bin]]
+name = "fakegen"
+path = "src/bin/fakegen.rs"
+
+[lib]
+name = "timespent"
+path = "src/lib.rs"
+
+
 [dev-dependencies]
 criterion = {version = "^0.4", features = ["html_reports"]}
 
@@ -18,6 +27,7 @@ chrono = { version = "^0.4", features = ["serde"] }
 eyre = "^0.6"
 serde = { version = "^1", features = ["derive"] }
 ts-rs = { version = "^6", features = ["serde-compat", "chrono-impl"] }
+rand = "0.8.5"
 
 [[bench]]
 name = "graph_x_segments"

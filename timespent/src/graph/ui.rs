@@ -101,15 +101,27 @@ mod tests {
     fn test_new_graph() {
         let activities = Activities(vec![
             Activity {
-                start_datetime: NaiveDate::from_ymd(2022, 7, 22).and_hms(12, 0, 0),
-                end_datetime: NaiveDate::from_ymd(2022, 7, 22).and_hms(13, 0, 0),
+                start_datetime: NaiveDate::from_ymd_opt(2022, 7, 22)
+                    .unwrap()
+                    .and_hms_opt(12, 0, 0)
+                    .unwrap(),
+                end_datetime: NaiveDate::from_ymd_opt(2022, 7, 22)
+                    .unwrap()
+                    .and_hms_opt(13, 0, 0)
+                    .unwrap(),
                 description: "description".to_string(),
                 action: Action::Code,
                 projects: ["tag2".to_string(), "tag1".to_string()].into(),
             },
             Activity {
-                start_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(12, 0, 0),
-                end_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(13, 0, 0),
+                start_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                    .unwrap()
+                    .and_hms_opt(12, 0, 0)
+                    .unwrap(),
+                end_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                    .unwrap()
+                    .and_hms_opt(13, 0, 0)
+                    .unwrap(),
                 description: "description".to_string(),
                 action: Action::Review,
                 projects: ["tag2".to_string(), "tag3".to_string()].into(),
@@ -118,23 +130,23 @@ mod tests {
 
         let graph = Graph::new(&activities);
         let act_agg = ActivitiesAggregate(
-            NaiveDate::from_ymd(2022, 7, 22),
-            NaiveDate::from_ymd(2022, 7, 25),
+            NaiveDate::from_ymd_opt(2022, 7, 22).unwrap(),
+            NaiveDate::from_ymd_opt(2022, 7, 25).unwrap(),
             [Action::Code, Action::Review].into(),
             ["tag1".to_string(), "tag2".to_string(), "tag3".to_string()].into(),
         );
 
         let filter = Filter {
-            min_date: NaiveDate::from_ymd(2022, 7, 22),
-            max_date: NaiveDate::from_ymd(2022, 7, 25),
+            min_date: NaiveDate::from_ymd_opt(2022, 7, 22).unwrap(),
+            max_date: NaiveDate::from_ymd_opt(2022, 7, 25).unwrap(),
             actions: [Action::Code, Action::Review].into(),
             projects: ["tag1".to_string(), "tag2".to_string(), "tag3".to_string()].into(),
             description: None,
         };
 
         let sxs = ScaleXSegments::new(
-            &NaiveDate::from_ymd(2022, 7, 22),
-            &NaiveDate::from_ymd(2022, 7, 25),
+            &NaiveDate::from_ymd_opt(2022, 7, 22).unwrap(),
+            &NaiveDate::from_ymd_opt(2022, 7, 25).unwrap(),
         );
 
         let y_act = YActivities::new(&activities, &act_agg.2, &act_agg.3, &sxs);
@@ -150,15 +162,27 @@ mod tests {
     fn test_graph_filter() {
         let activities = Activities(vec![
             Activity {
-                start_datetime: NaiveDate::from_ymd(2022, 7, 22).and_hms(12, 0, 0),
-                end_datetime: NaiveDate::from_ymd(2022, 7, 22).and_hms(13, 0, 0),
+                start_datetime: NaiveDate::from_ymd_opt(2022, 7, 22)
+                    .unwrap()
+                    .and_hms_opt(12, 0, 0)
+                    .unwrap(),
+                end_datetime: NaiveDate::from_ymd_opt(2022, 7, 22)
+                    .unwrap()
+                    .and_hms_opt(13, 0, 0)
+                    .unwrap(),
                 description: "act 1".to_string(),
                 action: Action::Code,
                 projects: ["tag1".to_string(), "tag2".to_string()].into(),
             },
             Activity {
-                start_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(12, 0, 0),
-                end_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(13, 0, 0),
+                start_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                    .unwrap()
+                    .and_hms_opt(12, 0, 0)
+                    .unwrap(),
+                end_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                    .unwrap()
+                    .and_hms_opt(13, 0, 0)
+                    .unwrap(),
                 description: "act".to_string(),
                 action: Action::Review,
                 projects: ["tag2".to_string(), "tag3".to_string()].into(),
@@ -168,8 +192,8 @@ mod tests {
         let mut graph = Graph::new(&activities);
 
         let filter = Filter {
-            min_date: NaiveDate::from_ymd(2022, 7, 22),
-            max_date: NaiveDate::from_ymd(2022, 7, 22),
+            min_date: NaiveDate::from_ymd_opt(2022, 7, 22).unwrap(),
+            max_date: NaiveDate::from_ymd_opt(2022, 7, 22).unwrap(),
             actions: [Action::Code, Action::Review].into(),
             projects: ["tag2".to_string()].into(),
             description: None,
@@ -177,12 +201,12 @@ mod tests {
         graph.apply_filter(&filter);
 
         let sxs = ScaleXSegments::new(
-            &NaiveDate::from_ymd(2022, 7, 22),
-            &NaiveDate::from_ymd(2022, 7, 22),
+            &NaiveDate::from_ymd_opt(2022, 7, 22).unwrap(),
+            &NaiveDate::from_ymd_opt(2022, 7, 22).unwrap(),
         );
         let filtered_activities = activities.filter(
-            &NaiveDate::from_ymd(2022, 7, 22),
-            &NaiveDate::from_ymd(2022, 7, 22),
+            &NaiveDate::from_ymd_opt(2022, 7, 22).unwrap(),
+            &NaiveDate::from_ymd_opt(2022, 7, 22).unwrap(),
             &[Action::Code].into(),
             &["tag2".to_string()].into(),
             &None,

@@ -2,6 +2,7 @@ use chrono::{NaiveDate, NaiveDateTime};
 use eyre::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
+use std::fmt::Display;
 use std::str::FromStr;
 use ts_rs::TS;
 
@@ -27,6 +28,19 @@ impl FromStr for Action {
             "code" => Ok(Action::Code),
             "docs" => Ok(Action::Docs),
             _ => Err(()),
+        }
+    }
+}
+
+impl Display for Action {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Action::Review => write!(f, "review"),
+            Action::Meeting => write!(f, "meeting"),
+            Action::Research => write!(f, "research"),
+            Action::Code => write!(f, "code"),
+            Action::Docs => write!(f, "docs"),
+            Action::Unknown => write!(f, "unknown"),
         }
     }
 }
@@ -59,6 +73,25 @@ pub struct Activity {
     pub projects: HashSet<String>,
 }
 
+impl Display for Activity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}h{}-{}h{}: [{}]{} {}",
+            self.start_datetime.format("%H"),
+            self.end_datetime.format("%M"),
+            self.end_datetime.format("%H"),
+            self.end_datetime.format("%M"),
+            self.action,
+            self.projects
+                .iter()
+                .map(|prj| "[".to_string() + prj + "]")
+                .collect::<String>(),
+            self.description,
+        )
+    }
+}
+
 #[derive(Eq, PartialEq, Debug, Clone, Deserialize, Serialize, TS)]
 #[ts(export)]
 pub struct Activities(pub Vec<Activity>);
@@ -77,8 +110,8 @@ impl Activities {
         // find the first date, last date and activities range dates
         self.0.iter().fold(
             ActivitiesAggregate(
-                NaiveDate::from_ymd(9999, 1, 1),
-                NaiveDate::from_ymd(0, 1, 1),
+                NaiveDate::from_ymd_opt(9999, 1, 1).unwrap(),
+                NaiveDate::from_ymd_opt(0, 1, 1).unwrap(),
                 HashSet::new(),
                 HashSet::new(),
             ),
@@ -146,6 +179,16 @@ impl FromIterator<Activity> for Activities {
     }
 }
 
+impl Display for Activities {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for activity in &self.0 {
+            writeln!(f, "{}", activity)?;
+        }
+
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -187,15 +230,27 @@ mod tests {
     fn test_activities_aggregate() {
         let activities = Activities(vec![
             Activity {
-                start_datetime: NaiveDate::from_ymd(2022, 7, 22).and_hms(12, 0, 0),
-                end_datetime: NaiveDate::from_ymd(2022, 7, 22).and_hms(13, 0, 0),
+                start_datetime: NaiveDate::from_ymd_opt(2022, 7, 22)
+                    .unwrap()
+                    .and_hms_opt(12, 0, 0)
+                    .unwrap(),
+                end_datetime: NaiveDate::from_ymd_opt(2022, 7, 22)
+                    .unwrap()
+                    .and_hms_opt(13, 0, 0)
+                    .unwrap(),
                 description: "description".to_string(),
                 action: Action::Code,
                 projects: ["tag2".to_string(), "tag3".to_string()].into(),
             },
             Activity {
-                start_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(12, 0, 0),
-                end_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(13, 0, 0),
+                start_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                    .unwrap()
+                    .and_hms_opt(12, 0, 0)
+                    .unwrap(),
+                end_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                    .unwrap()
+                    .and_hms_opt(13, 0, 0)
+                    .unwrap(),
                 description: "description".to_string(),
                 action: Action::Review,
                 projects: ["tag2".to_string(), "tag3".to_string()].into(),
@@ -205,8 +260,8 @@ mod tests {
         assert_eq!(
             activities.aggregate_all(),
             ActivitiesAggregate(
-                NaiveDate::from_ymd(2022, 7, 22),
-                NaiveDate::from_ymd(2022, 7, 25),
+                NaiveDate::from_ymd_opt(2022, 7, 22).unwrap(),
+                NaiveDate::from_ymd_opt(2022, 7, 25).unwrap(),
                 [Action::Review, Action::Code].into(),
                 ["tag2".to_string(), "tag3".to_string()].into(),
             )
@@ -217,15 +272,27 @@ mod tests {
     fn test_activities_filter() {
         let activities = Activities(vec![
             Activity {
-                start_datetime: NaiveDate::from_ymd(2022, 7, 22).and_hms(12, 0, 0),
-                end_datetime: NaiveDate::from_ymd(2022, 7, 22).and_hms(13, 0, 0),
+                start_datetime: NaiveDate::from_ymd_opt(2022, 7, 22)
+                    .unwrap()
+                    .and_hms_opt(12, 0, 0)
+                    .unwrap(),
+                end_datetime: NaiveDate::from_ymd_opt(2022, 7, 22)
+                    .unwrap()
+                    .and_hms_opt(13, 0, 0)
+                    .unwrap(),
                 description: "description".to_string(),
                 action: Action::Code,
                 projects: ["tag2".to_string(), "tag1".to_string()].into(),
             },
             Activity {
-                start_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(12, 0, 0),
-                end_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(13, 0, 0),
+                start_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                    .unwrap()
+                    .and_hms_opt(12, 0, 0)
+                    .unwrap(),
+                end_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                    .unwrap()
+                    .and_hms_opt(13, 0, 0)
+                    .unwrap(),
                 description: "description".to_string(),
                 action: Action::Review,
                 projects: ["tag2".to_string(), "tag3".to_string()].into(),
@@ -234,15 +301,21 @@ mod tests {
 
         assert_eq!(
             activities.filter(
-                &NaiveDate::from_ymd(2022, 7, 23),
-                &NaiveDate::from_ymd(2022, 7, 30),
+                &NaiveDate::from_ymd_opt(2022, 7, 23).unwrap(),
+                &NaiveDate::from_ymd_opt(2022, 7, 30).unwrap(),
                 &[Action::Code, Action::Review].into(),
                 &["tag2".to_string()].into(),
                 &None,
             ),
             Activities(vec![Activity {
-                start_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(12, 0, 0),
-                end_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(13, 0, 0),
+                start_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                    .unwrap()
+                    .and_hms_opt(12, 0, 0)
+                    .unwrap(),
+                end_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                    .unwrap()
+                    .and_hms_opt(13, 0, 0)
+                    .unwrap(),
                 description: "description".to_string(),
                 action: Action::Review,
                 projects: ["tag2".to_string(), "tag3".to_string()].into(),
@@ -251,15 +324,21 @@ mod tests {
 
         assert_eq!(
             activities.filter(
-                &NaiveDate::from_ymd(2022, 7, 23),
-                &NaiveDate::from_ymd(2022, 7, 30),
+                &NaiveDate::from_ymd_opt(2022, 7, 23).unwrap(),
+                &NaiveDate::from_ymd_opt(2022, 7, 30).unwrap(),
                 &[Action::Code, Action::Review].into(),
                 &["tag2".to_string(), "tag3".to_string()].into(),
                 &Some("desc".to_string()),
             ),
             Activities(vec![Activity {
-                start_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(12, 0, 0),
-                end_datetime: NaiveDate::from_ymd(2022, 7, 25).and_hms(13, 0, 0),
+                start_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                    .unwrap()
+                    .and_hms_opt(12, 0, 0)
+                    .unwrap(),
+                end_datetime: NaiveDate::from_ymd_opt(2022, 7, 25)
+                    .unwrap()
+                    .and_hms_opt(13, 0, 0)
+                    .unwrap(),
                 description: "description".to_string(),
                 action: Action::Review,
                 projects: ["tag2".to_string(), "tag3".to_string()].into(),
@@ -268,13 +347,32 @@ mod tests {
 
         assert_eq!(
             activities.filter(
-                &NaiveDate::from_ymd(2022, 7, 23),
-                &NaiveDate::from_ymd(2022, 7, 30),
+                &NaiveDate::from_ymd_opt(2022, 7, 23).unwrap(),
+                &NaiveDate::from_ymd_opt(2022, 7, 30).unwrap(),
                 &[Action::Code, Action::Review].into(),
                 &["tag2".to_string(), "tag3".to_string()].into(),
                 &Some("proto".to_string()),
             ),
             Activities(vec![])
         );
+    }
+
+    #[test]
+    fn test_activity_display() {
+        let act = Activity {
+            start_datetime: NaiveDate::from_ymd_opt(2022, 7, 22)
+                .unwrap()
+                .and_hms_opt(12, 0, 0)
+                .unwrap(),
+            end_datetime: NaiveDate::from_ymd_opt(2022, 7, 22)
+                .unwrap()
+                .and_hms_opt(13, 0, 0)
+                .unwrap(),
+            description: "description".to_string(),
+            action: Action::Code,
+            projects: ["tag2".to_string()].into(),
+        };
+
+        assert_eq!(act.to_string(), "12h00-13h00: [code][tag2] description");
     }
 }

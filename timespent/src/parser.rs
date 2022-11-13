@@ -75,15 +75,27 @@ mod tests {
     #[test]
     fn test_parse_activity() {
         let target_act = Activity {
-            start_datetime: NaiveDate::from_ymd(2022, 7, 5).and_hms(12, 0, 0),
-            end_datetime: NaiveDate::from_ymd(2022, 7, 5).and_hms(13, 0, 0),
+            start_datetime: NaiveDate::from_ymd_opt(2022, 7, 5)
+                .unwrap()
+                .and_hms_opt(12, 0, 0)
+                .unwrap(),
+            end_datetime: NaiveDate::from_ymd_opt(2022, 7, 5)
+                .unwrap()
+                .and_hms_opt(13, 0, 0)
+                .unwrap(),
             description: "description".to_string(),
             action: Action::Review,
             projects: ["tag2".to_string(), "tag3".to_string()].into(),
         };
         let target_act_dash = Activity {
-            start_datetime: NaiveDate::from_ymd(2022, 7, 5).and_hms(12, 0, 0),
-            end_datetime: NaiveDate::from_ymd(2022, 7, 5).and_hms(13, 0, 0),
+            start_datetime: NaiveDate::from_ymd_opt(2022, 7, 5)
+                .unwrap()
+                .and_hms_opt(12, 0, 0)
+                .unwrap(),
+            end_datetime: NaiveDate::from_ymd_opt(2022, 7, 5)
+                .unwrap()
+                .and_hms_opt(13, 0, 0)
+                .unwrap(),
             description: "description".to_string(),
             action: Action::Code,
             projects: [
@@ -94,8 +106,14 @@ mod tests {
             .into(),
         };
         let target_act_spaces = Activity {
-            start_datetime: NaiveDate::from_ymd(2022, 7, 5).and_hms(12, 0, 0),
-            end_datetime: NaiveDate::from_ymd(2022, 7, 5).and_hms(13, 0, 0),
+            start_datetime: NaiveDate::from_ymd_opt(2022, 7, 5)
+                .unwrap()
+                .and_hms_opt(12, 0, 0)
+                .unwrap(),
+            end_datetime: NaiveDate::from_ymd_opt(2022, 7, 5)
+                .unwrap()
+                .and_hms_opt(13, 0, 0)
+                .unwrap(),
             description: "description of my tests".to_string(),
             action: Action::Review,
             projects: ["tag2".to_string(), "tag3".to_string()].into(),
