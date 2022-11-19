@@ -29,6 +29,7 @@
   import { filter } from "./stores";
   import { applyFilter as tauriApplyFilter } from "./commands";
   async function applyFilter() {
+    console.log("wtf")
     await tauriApplyFilter($filter);
     await syncGraph();
   }
@@ -49,7 +50,7 @@
       <GraphComponent
         selected_scale={$selected_scale}
         {total_minutes_all}
-        labels={displayedXLabels(scale_x_segments[$selected_scale])}
+        labels={displayedXLabels(scale_x_segments.values[$selected_scale])}
         {y_activities}
       />
     </div>

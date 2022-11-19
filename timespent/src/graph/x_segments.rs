@@ -42,7 +42,10 @@ impl std::fmt::Display for XSegment {
 
 #[derive(PartialEq, Eq, Debug, Deserialize, Serialize, Clone, TS)]
 #[ts(export)]
-pub struct ScaleXSegments(pub HashMap<Scale, Vec<XSegment>>);
+pub struct ScaleXSegments {
+    pub values: HashMap<Scale, Vec<XSegment>>,
+    index: HashMap<Scale, HashMap<String, usize>>,
+}
 
 impl ScaleXSegments {
     pub fn new(start_date: &NaiveDate, end_date: &NaiveDate) -> ScaleXSegments {
@@ -159,13 +162,77 @@ impl ScaleXSegments {
         x_segments.insert(Scale::Month, x_segments_month.into_iter().collect());
         x_segments.insert(Scale::Year, x_segments_year.into_iter().collect());
 
-        ScaleXSegments(x_segments)
+        let index = ScaleXSegments::build_index(&x_segments);
+        ScaleXSegments {
+            values: x_segments,
+            index,
+        }
+    }
+
+    fn build_index(
+        x_segments: &HashMap<Scale, Vec<XSegment>>,
+    ) -> HashMap<Scale, HashMap<String, usize>> {
+        [
+            (
+                Scale::Day,
+                x_segments
+                    .get(&Scale::Day)
+                    .unwrap()
+                    .iter()
+                    .enumerate()
+                    .map(|(u, x)| (x.start_datetime.date().to_string(), u))
+                    .collect(),
+            ),
+            (
+                Scale::Week,
+                x_segments
+                    .get(&Scale::Week)
+                    .unwrap()
+                    .iter()
+                    .enumerate()
+                    .map(|(u, x)| {
+                        (
+                            x.start_datetime.year().to_string()
+                                + &x.start_datetime.iso_week().week().to_string(),
+                            u,
+                        )
+                    })
+                    .collect(),
+            ),
+            (
+                Scale::Month,
+                x_segments
+                    .get(&Scale::Month)
+                    .unwrap()
+                    .iter()
+                    .enumerate()
+                    .map(|(u, x)| {
+                        (
+                            x.start_datetime.year().to_string()
+                                + &x.start_datetime.month().to_string(),
+                            u,
+                        )
+                    })
+                    .collect(),
+            ),
+            (
+                Scale::Year,
+                x_segments
+                    .get(&Scale::Year)
+                    .unwrap()
+                    .iter()
+                    .enumerate()
+                    .map(|(u, x)| (x.start_datetime.year().to_string(), u))
+                    .collect(),
+            ),
+        ]
+        .into()
     }
 
     pub fn filter_by_date(&self, start_date: &NaiveDate, end_date: &NaiveDate) -> ScaleXSegments {
         let mut x_segments: HashMap<Scale, Vec<XSegment>> = HashMap::new();
 
-        self.0.iter().for_each(|(scale, scale_x_segments)| {
+        self.values.iter().for_each(|(scale, scale_x_segments)| {
             let mut filtered_x_segments = Vec::new();
             for xsegment in scale_x_segments {
                 if xsegment.start_datetime.date() >= *start_date
@@ -177,7 +244,54 @@ impl ScaleXSegments {
             x_segments.insert(*scale, filtered_x_segments);
         });
 
-        ScaleXSegments(x_segments)
+        let index = ScaleXSegments::build_index(&x_segments);
+
+        ScaleXSegments {
+            values: x_segments,
+            index,
+        }
+    }
+
+    pub fn find_correponding_x_segment_idx(
+        &self,
+        scale: &Scale,
+        datetime: &NaiveDateTime,
+    ) -> usize {
+        match scale {
+            Scale::Day => {
+                let index = datetime.date().to_string();
+                let x_segment_idx = self.index.get(&Scale::Day).unwrap().get(&index);
+                match x_segment_idx {
+                    Some(idx) => *idx,
+                    None => 0,
+                }
+            }
+            Scale::Week => {
+                let index = datetime.year().to_string() + &datetime.iso_week().week().to_string();
+                let x_segment_idx = self.index.get(&Scale::Week).unwrap().get(&index);
+                match x_segment_idx {
+                    Some(idx) => *idx,
+                    None => 0,
+                }
+            }
+            Scale::Month => {
+                let index = datetime.year().to_string() + &datetime.month().to_string();
+                let x_segment_idx = self.index.get(&Scale::Month).unwrap().get(&index);
+                match x_segment_idx {
+                    Some(idx) => *idx,
+                    None => 0,
+                }
+            }
+            Scale::Year => {
+                let year = datetime.year();
+                let x_segment_idx = self.index.get(&Scale::Year).unwrap().get(&year.to_string());
+                match x_segment_idx {
+                    Some(idx) => *idx,
+                    None => 0,
+                }
+            }
+            Scale::All => 0,
+        }
     }
 }
 
@@ -279,10 +393,10 @@ mod tests {
             &NaiveDate::from_ymd_opt(2023, 1, 2).unwrap(),
         );
 
-        assert_eq!(sxs.0.len(), 5, "wrong number of scales");
+        assert_eq!(sxs.values.len(), 5, "wrong number of scales");
 
         assert_eq!(
-            sxs.0.get(&Scale::Day).unwrap(),
+            sxs.values.get(&Scale::Day).unwrap(),
             &vec![
                 XSegment {
                     scale: Scale::Day,
@@ -322,7 +436,7 @@ mod tests {
         );
 
         assert_eq!(
-            sxs.0.get(&Scale::Week).unwrap(),
+            sxs.values.get(&Scale::Week).unwrap(),
             &vec![
                 XSegment {
                     scale: Scale::Week,
@@ -351,7 +465,7 @@ mod tests {
         );
 
         assert_eq!(
-            sxs.0.get(&Scale::Month).unwrap(),
+            sxs.values.get(&Scale::Month).unwrap(),
             &vec![
                 XSegment {
                     scale: Scale::Month,
@@ -380,7 +494,7 @@ mod tests {
         );
 
         assert_eq!(
-            sxs.0.get(&Scale::Year).unwrap(),
+            sxs.values.get(&Scale::Year).unwrap(),
             &vec![
                 XSegment {
                     scale: Scale::Year,
@@ -409,7 +523,7 @@ mod tests {
         );
 
         assert_eq!(
-            sxs.0.get(&Scale::All).unwrap(),
+            sxs.values.get(&Scale::All).unwrap(),
             &vec![XSegment {
                 scale: Scale::All,
                 start_datetime: NaiveDate::from_ymd_opt(2022, 12, 31)

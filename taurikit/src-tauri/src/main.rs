@@ -10,10 +10,15 @@
 )]
 
 use serde::{Deserialize, Serialize};
+use serde_with::serde_as;
+use serde_with::DurationSeconds;
 
+#[serde_as]
 #[derive(Serialize, Deserialize)]
 struct MyConfig {
     base_path: String,
+    #[serde_as(as = "DurationSeconds<i64>")]
+    start_ago: chrono::Duration,
 }
 
 /// `MyConfig` implements `Default`
@@ -21,6 +26,7 @@ impl ::std::default::Default for MyConfig {
     fn default() -> Self {
         Self {
             base_path: "../../timespent/tests/days".into(),
+            start_ago: chrono::Duration::days(14),
         }
     }
 }
@@ -29,6 +35,7 @@ impl ::std::default::Default for MyConfig {
 use std::sync::RwLock;
 
 use timespent::{
+    graph::scale::Scale,
     graph::ui::{Filter, Graph},
     graph::x_segments::ScaleXSegments,
     graph::y_activities::YActivities,
@@ -50,10 +57,25 @@ fn main() {
     println!("Loading data from {}", directory);
 
     let activities = loader::load_from_filepath(directory).expect("Failed to load data");
-    let graph = Graph::new(&activities);
+    let mut graph = Graph::new(&activities);
+
+    let mut curr_filter = graph.applied_filter.clone();
+    curr_filter.min_date = curr_filter.max_date - cfg.start_ago;
+    graph.apply_filter(&curr_filter);
+
+    println!(
+        "{:?}",
+        &graph
+            .filtered_per_scale_y_activities
+            .scale_total_minutes
+            .get(&Scale::Day)
+            .unwrap()
+    );
+
+    let state = StateContainer(RwLock::new(graph));
 
     tauri::Builder::default()
-        .manage(StateContainer(RwLock::new(graph)))
+        .manage(state)
         .invoke_handler(tauri::generate_handler![
             get_graph,
             get_filter,
