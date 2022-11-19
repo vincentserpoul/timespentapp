@@ -35,7 +35,6 @@ impl ::std::default::Default for MyConfig {
 use std::sync::RwLock;
 
 use timespent::{
-    graph::scale::Scale,
     graph::ui::{Filter, Graph},
     graph::x_segments::ScaleXSegments,
     graph::y_activities::YActivities,
@@ -62,15 +61,6 @@ fn main() {
     let mut curr_filter = graph.applied_filter.clone();
     curr_filter.min_date = curr_filter.max_date - cfg.start_ago;
     graph.apply_filter(&curr_filter);
-
-    println!(
-        "{:?}",
-        &graph
-            .filtered_per_scale_y_activities
-            .scale_total_minutes
-            .get(&Scale::Day)
-            .unwrap()
-    );
 
     let state = StateContainer(RwLock::new(graph));
 
