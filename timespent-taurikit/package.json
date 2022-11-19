@@ -35,7 +35,7 @@
 	"dependencies": {
 		"@tauri-apps/api": "^1.1.0",
 		"@types/chartjs": "^0.0.31",
-		"chart.js": "^3.9.1",
+		"chart.js": "^4.0.1",
 		"svelte-range-slider-pips": "^2.0.3"
 	}
 }
