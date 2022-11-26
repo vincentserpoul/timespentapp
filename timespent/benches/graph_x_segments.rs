@@ -1,5 +1,6 @@
 use chrono::NaiveDate;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use pprof::criterion::{Output, PProfProfiler};
 use timespent::graph::x_segments::ScaleXSegments;
 
 pub fn criterion_benchmark(c: &mut Criterion) {
@@ -10,5 +11,9 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, criterion_benchmark);
+criterion_group! {
+    name = benches;
+    config = Criterion::default().with_profiler(PProfProfiler::new(100, Output::Flamegraph(None)));
+    targets = criterion_benchmark
+}
 criterion_main!(benches);

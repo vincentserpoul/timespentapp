@@ -12,6 +12,14 @@ pub fn load_from_filepath(path: &str) -> Result<Activities> {
         let f = f?;
         let path = f.path();
         let filename = path.file_name().unwrap().to_str().unwrap();
+        if let Some(ext) = path.extension() {
+            if ext != "txt" {
+                continue;
+            }
+        } else {
+            continue;
+        }
+
         let date = filename.split(".txt").next().unwrap();
         let f = File::open(f.path())?;
         let reader = BufReader::new(f);

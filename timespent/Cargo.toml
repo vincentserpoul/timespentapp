@@ -20,6 +20,7 @@ path = "src/lib.rs"
 
 [dev-dependencies]
 criterion = {version = "^0.4", features = ["html_reports"]}
+pprof = { version = "^0.11", features = ["criterion", "flamegraph"] }
 
 [dependencies]
 nom = "^7"
@@ -35,4 +36,8 @@ harness = false
 
 [[bench]]
 name = "graph_y_activities"
+harness = false
+
+[[bench]]
+name = "load_from_gen"
 harness = false
