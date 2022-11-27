@@ -7,42 +7,48 @@
 
 	import stringToColor from '../lib/stringToColor';
 
-	let option: echarts.EChartsOption = {
-		// tooltip: {
-		// 	trigger: 'axis',
-		// 	axisPointer: {
-		// 		type: 'cross'
-		// 	}
-		// },
-		color: activity_percents.map((ap) => stringToColor(ap[0])),
-		legend: {
-			data: activity_percents.map((ap) => ap[0]),
-			type: 'scroll',
-			textStyle: {
-				color: '#fff'
-			}
-		},
-		xAxis: {
-			type: 'category',
-			data: labels
-		},
-		yAxis: {
-			type: 'value'
-		},
-		series: activity_percents.map((ap) => {
-			return {
-				name: ap[0],
-				type: 'line',
-				smooth: true,
-				data: ap[1]
-			};
-		})
-	};
+	let option: echarts.EChartsOption;
+
+	$: {
+		option = {
+			// tooltip: {
+			// 	trigger: 'axis',
+			// 	axisPointer: {
+			// 		type: 'cross'
+			// 	}
+			// },
+			// color: activity_percents.map((ap) => stringToColor(ap[0])),
+			legend: {
+				data: activity_percents.map((ap) => ap[0]),
+				type: 'scroll',
+				textStyle: {
+					color: '#fff'
+				}
+			},
+			xAxis: {
+				type: 'category',
+				data: labels
+			},
+			yAxis: {
+				type: 'value'
+			},
+			series: activity_percents.map((ap) => {
+				return {
+					name: ap[0],
+					type: 'line',
+					smooth: true,
+					data: ap[1]
+				};
+			})
+		};
+	}
 </script>
 
-<div id={idchart} class="chart">
-	<ECharts {idchart} {option} />
-</div>
+{#if activity_percents.length > 0}
+	<div id={idchart} class="chart">
+		<ECharts {idchart} {option} />
+	</div>
+{/if}
 
 <style>
 	.chart {

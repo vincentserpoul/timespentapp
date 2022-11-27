@@ -7,57 +7,63 @@
 
 	import stringToColor from '../lib/stringToColor';
 
-	let option: echarts.EChartsOption = {
-		// title: {
-		// 	text: 'Stacked Area Chart'
-		// },
-		// tooltip: {
-		// 	trigger: 'axis',
-		// 	axisPointer: {
-		// 		type: 'cross',
-		// 		label: {
-		// 			backgroundColor: '#6a7985'
-		// 		}
-		// 	}
-		// },
-		color: activity_percents.map((ap) => stringToColor(ap[0])),
-		legend: {
-			data: activity_percents.map((ap) => ap[0]),
-			textStyle: {
-				color: '#fff'
-			}
-		},
-		xAxis: [
-			{
-				type: 'category',
-				boundaryGap: false,
-				data: labels
-			}
-		],
-		yAxis: [
-			{
-				type: 'value'
-			}
-		],
-		series: activity_percents.map((ap) => {
-			return {
-				name: ap[0],
-				type: 'line',
-				stack: 'Total',
-				areaStyle: {},
-				smooth: true,
-				emphasis: {
-					focus: 'series'
-				},
-				data: ap[1]
-			};
-		})
-	};
+	let option: echarts.EChartsOption;
+
+	$: {
+		option = {
+			// title: {
+			// 	text: 'Stacked Area Chart'
+			// },
+			// tooltip: {
+			// 	trigger: 'axis',
+			// 	axisPointer: {
+			// 		type: 'cross',
+			// 		label: {
+			// 			backgroundColor: '#6a7985'
+			// 		}
+			// 	}
+			// },
+			// color: activity_percents.map((ap) => stringToColor(ap[0])),
+			legend: {
+				data: activity_percents.map((ap) => ap[0]),
+				textStyle: {
+					color: '#fff'
+				}
+			},
+			xAxis: [
+				{
+					type: 'category',
+					boundaryGap: false,
+					data: labels
+				}
+			],
+			yAxis: [
+				{
+					type: 'value'
+				}
+			],
+			series: activity_percents.map((ap) => {
+				return {
+					name: ap[0],
+					type: 'line',
+					stack: 'Total',
+					areaStyle: {},
+					smooth: true,
+					emphasis: {
+						focus: 'series'
+					},
+					data: ap[1]
+				};
+			})
+		};
+	}
 </script>
 
-<div id={idchart} class="chart">
-	<ECharts {idchart} {option} />
-</div>
+{#if activity_percents.length > 0}
+	<div id={idchart} class="chart">
+		<ECharts {idchart} {option} />
+	</div>
+{/if}
 
 <style>
 	.chart {

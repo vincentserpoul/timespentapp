@@ -6,48 +6,54 @@
 
 	import stringToColor from '../lib/stringToColor';
 
-	let option: echarts.EChartsOption = {
-		legend: {
-			orient: 'vertical',
-			left: 'left',
-			textStyle: {
-				color: '#fff'
-			}
-		},
+	let option: echarts.EChartsOption;
 
-		color: activity_percents.map((v) => stringToColor(v.name)),
-		series: [
-			{
-				name: 'Radius Mode',
-				type: 'pie',
-				radius: [20, 120],
-				center: ['60%', '60%'],
-				roseType: 'radius',
-				itemStyle: {
-					borderRadius: 10,
-					borderColor: '#fff',
-					borderWidth: 1
-				},
-				label: {
-					show: false
-				},
-				emphasis: {
+	$: {
+		option = {
+			legend: {
+				orient: 'vertical',
+				left: 'left',
+				textStyle: {
+					color: '#fff'
+				}
+			},
+
+			// color: activity_percents.map((v) => stringToColor(v.name)),
+			series: [
+				{
+					name: 'Radius Mode',
+					type: 'pie',
+					radius: [20, 120],
+					center: ['60%', '60%'],
+					roseType: 'radius',
+					itemStyle: {
+						borderRadius: 10,
+						borderColor: '#fff',
+						borderWidth: 1
+					},
 					label: {
-						show: true,
-						fontSize: 15,
-						fontWeight: 'bold',
-						color: '#fff'
-					}
-				},
-				data: activity_percents
-			}
-		]
-	};
+						show: false
+					},
+					emphasis: {
+						label: {
+							show: true,
+							fontSize: 15,
+							fontWeight: 'bold',
+							color: '#fff'
+						}
+					},
+					data: activity_percents
+				}
+			]
+		};
+	}
 </script>
 
-<div id={idpie} class="pie">
-	<ECharts idchart={idpie} {option} />
-</div>
+{#if activity_percents.length > 0}
+	<div id={idpie} class="pie">
+		<ECharts idchart={idpie} {option} />
+	</div>
+{/if}
 
 <style>
 	.pie {
