@@ -7,8 +7,9 @@
 	export let labels: string[];
 	export let y_activities: YActivities;
 
-	import Lines from './Lines.svelte';
-	import Camembert from './Camembert.svelte';
+	import EPie from './EPie.svelte';
+	import ELine from './ELine.svelte';
+	import EStacked from './EStacked.svelte';
 
 	function calcActivityPercents(total_minutes: number[], activity_minutes: number[]): number[] {
 		return activity_minutes.map((activity_minute, i) => {
@@ -25,24 +26,21 @@
 		<h1>projects</h1>
 	</div>
 	<div class="grid-item doughnut projects">
-		<Camembert
-			activity_percents={Object.entries(y_activities.scale_projects_total_minutes['All'])
-				.map((activity) => [
-					activity[0],
-					Math.round((Number(activity[1][0]) * 100) / Number(total_minutes_all))
-				])
-				.reduce(
-					(acc, activity) => {
-						acc.labels.push(activity[0]);
-						acc.values.push(activity[1]);
-						return acc;
-					},
-					{ labels: [], values: [] }
-				)}
+		<EPie
+			idpie="projectsPie"
+			activity_percents={Object.entries(y_activities.scale_projects_total_minutes['All']).map(
+				(activity) => {
+					return {
+						name: activity[0],
+						value: Math.round((Number(activity[1][0]) * 100) / Number(total_minutes_all))
+					};
+				}
+			)}
 		/>
 	</div>
 	<div class="grid-item graph projects">
-		<Lines
+		<ELine
+			idchart="projectsChart"
 			{labels}
 			activity_percents={Object.entries(
 				y_activities.scale_projects_total_minutes[selected_scale]
@@ -54,24 +52,21 @@
 	</div>
 	<div class="grid-item title actions"><h1>activities</h1></div>
 	<div class="grid-item doughnut actions">
-		<Camembert
-			activity_percents={Object.entries(y_activities.scale_actions_total_minutes['All'])
-				.map((activity) => [
-					activity[0],
-					Math.round((Number(activity[1][0]) * 100) / Number(total_minutes_all))
-				])
-				.reduce(
-					(acc, activity) => {
-						acc.labels.push(activity[0]);
-						acc.values.push(activity[1]);
-						return acc;
-					},
-					{ labels: [], values: [] }
-				)}
+		<EPie
+			idpie="actionsPie"
+			activity_percents={Object.entries(y_activities.scale_actions_total_minutes['All']).map(
+				(activity) => {
+					return {
+						name: activity[0],
+						value: Math.round((Number(activity[1][0]) * 100) / Number(total_minutes_all))
+					};
+				}
+			)}
 		/>
 	</div>
 	<div class="grid-item graph actions">
-		<Lines
+		<EStacked
+			idchart="actionsChart"
 			{labels}
 			activity_percents={Object.entries(
 				y_activities.scale_actions_total_minutes[selected_scale]
