@@ -56,7 +56,11 @@ fn main() {
     println!("Loading data from {}", directory);
 
     let activities = loader::load_from_filepath(directory).expect("Failed to load data");
-    let graph = Graph::new(&activities);
+    let mut graph = Graph::new(&activities);
+
+    let mut default_filter = graph.all_filter.clone();
+    default_filter.min_date = default_filter.max_date - cfg.start_ago;
+    graph.apply_filter(&default_filter);
 
     let state = StateContainer(RwLock::new(graph));
 
