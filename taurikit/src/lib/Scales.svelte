@@ -34,10 +34,10 @@
 	ul.scale-list li {
 		display: inline-block;
 		cursor: pointer;
-		width: 10em;
-		padding: 1em;
+		width: 7em;
+		padding: 0.5em;
 		text-transform: lowercase;
-		margin: 0 1em 0 1em;
+		margin: 0 0.5em 0 0.5em;
 		border: 1px solid white;
 		border-radius: 1em;
 	}
@@ -45,6 +45,6 @@
 	.selected {
 		font-weight: bold;
 		color: black;
-		background-color: yellow;
+		background-color: rgb(206, 148, 82);
 	}
 </style>

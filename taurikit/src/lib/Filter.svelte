@@ -18,18 +18,9 @@
 </script>
 
 <div class="grid-container">
-	<div class="grid-item title">
-		<h1>filter</h1>
-	</div>
 	{#if all_x_labels.values}
-		<div class="grid-item sub-title scales">
-			<h2>scale</h2>
-		</div>
 		<div class="grid-item sub-values scales">
 			<ScalesComponent />
-		</div>
-		<div class="grid-item sub-title slider">
-			<h2>time range</h2>
 		</div>
 		<div class="grid-item sub-values slider">
 			{#if all_x_labels.values[$selected_scale].length >= 2}
@@ -42,7 +33,7 @@
 				/>
 			{/if}
 		</div>
-		<div class="grid-item sub-title projects"><h2>projects</h2></div>
+		<!-- <div class="grid-item sub-title projects"><h2>projects</h2></div>
 		<div class="grid-item sub-values projects">
 			<ul class="activity-filter">
 				{#each all_filter.projects as project}
@@ -97,14 +88,13 @@
 					>
 				</li>
 			</ul>
-		</div>
+		</div> -->
 	{/if}
 </div>
 
 <style>
 	.grid-container {
 		display: grid;
-		padding: 1em;
 		text-align: center;
 		border: 1px white dashed;
 		border-radius: 1em;
@@ -133,11 +123,15 @@
 	}
 
 	.scales {
-		grid-row: 2;
+		grid-row: 1;
+		grid-column-start: 1;
+		grid-column-end: 3;
 	}
 
 	.slider {
-		grid-row: 3;
+		grid-row: 1;
+		grid-column-start: 3;
+		grid-column-end: 6;
 	}
 
 	.projects {

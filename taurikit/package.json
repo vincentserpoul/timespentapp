@@ -13,6 +13,7 @@
 		"tauri": "tauri"
 	},
 	"devDependencies": {
+		"@beyonk/svelte-datepicker": "^12.0.1",
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/adapter-static": "^1.0.0-next.44",
 		"@sveltejs/kit": "next",
@@ -30,7 +31,6 @@
 		"svelte-preprocess": "^4.10.6",
 		"tslib": "^2.3.1",
 		"typescript": "^4.7.4",
-		"@beyonk/svelte-datepicker": "^12.0.1",
 		"vite": "^3.1.0"
 	},
 	"type": "module",

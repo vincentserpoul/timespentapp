@@ -11,19 +11,29 @@
 	let selected = [filtered_min_date, filtered_max_date];
 </script>
 
-<DatePicker
-	start={min_date}
-	end={max_date}
-	range={true}
-	{selected}
-	on:range-selected={(e) => {
-		filter.update((f) => {
-			f.min_date = e.detail.from.toISOString().split('T')[0];
-			f.max_date = e.detail.to.toISOString().split('T')[0];
-			return f;
-		});
+<div class="time-range">
+	<DatePicker
+		start={min_date}
+		end={max_date}
+		range={true}
+		{selected}
+		on:range-selected={(e) => {
+			filter.update((f) => {
+				f.min_date = e.detail.from.toISOString().split('T')[0];
+				f.max_date = e.detail.to.toISOString().split('T')[0];
+				return f;
+			});
 
-		applyFilter();
-	}}
-/>
-<br />
+			applyFilter();
+		}}
+	/>
+</div>
+
+<style>
+	.time-range {
+		margin: 0.8em;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+</style>

@@ -14,15 +14,12 @@
 			// title: {
 			// 	text: 'Stacked Area Chart'
 			// },
-			// tooltip: {
-			// 	trigger: 'axis',
-			// 	axisPointer: {
-			// 		type: 'cross',
-			// 		label: {
-			// 			backgroundColor: '#6a7985'
-			// 		}
-			// 	}
-			// },
+			tooltip: {
+				trigger: 'axis',
+				axisPointer: {
+					type: 'cross'
+				}
+			},
 			// color: activity_percents.map((ap) => stringToColor(ap[0])),
 			legend: {
 				data: activity_percents.map((ap) => ap[0]),

@@ -15,7 +15,8 @@
 				left: 'left',
 				textStyle: {
 					color: '#fff'
-				}
+				},
+				type: 'scroll'
 			},
 
 			// color: activity_percents.map((v) => stringToColor(v.name)),

@@ -11,12 +11,12 @@
 
 	$: {
 		option = {
-			// tooltip: {
-			// 	trigger: 'axis',
-			// 	axisPointer: {
-			// 		type: 'cross'
-			// 	}
-			// },
+			tooltip: {
+				trigger: 'axis',
+				axisPointer: {
+					type: 'cross'
+				}
+			},
 			// color: activity_percents.map((ap) => stringToColor(ap[0])),
 			legend: {
 				data: activity_percents.map((ap) => ap[0]),

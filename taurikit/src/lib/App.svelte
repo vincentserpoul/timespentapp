@@ -45,6 +45,9 @@
 
 <main>
 	{#if all_x_labels}
+		<div id="filter">
+			<FilterComponent {all_x_labels} {all_filter} {applyFilter} />
+		</div>
 		<div id="charts">
 			<GraphComponent
 				selected_scale={$selected_scale}
@@ -53,18 +56,14 @@
 				{y_activities}
 			/>
 		</div>
-		<div id="filter">
-			<FilterComponent {all_x_labels} {all_filter} {applyFilter} />
-		</div>
 	{/if}
 </main>
 
 <style>
 	main {
-		padding: 2em;
+		padding: 0.5em;
 		color: #fff;
 		margin: 0;
-		padding: 8px;
 		box-sizing: border-box;
 		background-color: #121212;
 	}
