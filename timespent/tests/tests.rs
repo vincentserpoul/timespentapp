@@ -11,5 +11,7 @@ fn test_aggregates() {
     let activities = loader::load_from_filepath("tests/days").unwrap();
     let agg = activities.aggregate_all();
 
+    println!("{:?}", agg.2);
+
     assert_eq!(agg.2.len(), 4);
 }

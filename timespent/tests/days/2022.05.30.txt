@@ -2,7 +2,7 @@
 09h30-10h00: [rust][review] headers
 10h00-11h00: [rust][review] yamls
 11h00-11h45: [rust][review] secrets
-11h45-12h30: [rest-apis][code] handlers
+11h45-12h30: [rest-apis][code]
 
 14h00-15h45: [rust][code] reference rest API
 15h45-17h30: [meeting][manager] with MT
